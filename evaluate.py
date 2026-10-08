@@ -1,20 +1,20 @@
 """
 AuraCell 4D - evaluate.py  (entry script, reproducible without login)
 
-Satu kali jalan menghasilkan tabel ablasi lengkap pada Cell Tracking Challenge Fluo-N3DH-CHO:
+One run produces the full ablation table on Cell Tracking Challenge Fluo-N3DH-CHO:
 
-  Deteksi   : GT (centroid dari mask GT TRA)  |  OTSU (Otsu + watershed pada citra mentah, tanpa GT)
+  Detection : GT (centroids from GT TRA masks)  |  OTSU (Otsu + watershed on raw images, no GT)
   Tracker   : greedy_nogate | greedy_gate | ilp_nogate | ilp_gate
-  Gate      : ambang volume/massa DIKALIBRASI dari distribusi GT sekuens kalibrasi (bukan tebakan +/-15%)
-  Metrik    : DET, TRA resmi (py-ctcmetrics) + presisi/recall/F1 mitosis (pencocokan edge induk->anak ke GT)
+  Gate      : volume/mass thresholds CALIBRATED from the GT distribution of the calibration sequence (not a hand-set +/-15%)
+  Metrics   : official DET, TRA (py-ctcmetrics) + mitosis precision/recall/F1 (parent->daughter edges matched to GT)
 
-Pakai:
+Usage:
   pip install -r requirements.txt
-  python evaluate.py --data ./data --out ./results            # semua sekuens, semua varian
+  python evaluate.py --data ./data --out ./results            # all sequences, all variants
   python evaluate.py --seqs 01 --detect gt --trackers ilp_gate
 
-Keluaran: results/ablation.json, results/ablation.md, results/<seq>_<det>_<tracker>_RES/ (mask + res_track.txt)
-Semua angka di writeup berlabel [Terukur] berasal dari berkas ini.
+Outputs: results/ablation.json, results/ablation.md, results/<seq>_<det>_<tracker>_RES/ (masks + res_track.txt)
+Every number labelled [Measured] in the writeup comes from this file.
 """
 import argparse, json, os, shutil, sys, time, urllib.request, zipfile
 from pathlib import Path
@@ -44,7 +44,7 @@ def ensure_dataset(data_dir: Path) -> Path:
     data_dir.mkdir(parents=True, exist_ok=True)
     zp = data_dir / "Fluo-N3DH-CHO.zip"
     if not zp.exists():
-        log(f"[data] mengunduh {CTC_URL}")
+        log(f"[data] downloading {CTC_URL}")
         urllib.request.urlretrieve(CTC_URL, zp)
     with zipfile.ZipFile(zp) as z:
         z.extractall(data_dir)
@@ -73,7 +73,7 @@ def cells_from_mask(mask):
 
 
 def detect_otsu(raw, min_vox=400, min_dist_px=12):
-    """Deteksi label-free sederhana: gaussian -> Otsu -> watershed pada distance transform."""
+    """Simple label-free detection: gaussian -> Otsu -> watershed on the distance transform."""
     sm = gaussian(raw.astype(np.float32), sigma=(0.5, 2, 2), preserve_range=True)
     thr = threshold_otsu(sm)
     fg = sm > thr
@@ -94,7 +94,7 @@ def detect_otsu(raw, min_vox=400, min_dist_px=12):
 
 # ------------------------------------------------------------------ gate calibration
 def calibrate_gate(ds: Path, seq: str):
-    """Distribusi nyata rasio volume anak & konservasi massa pada divisi GT."""
+    """Empirical distribution of daughter-volume ratio and mass conservation over GT divisions."""
     tra = ds / f"{seq}_GT" / "TRA"
     tr = parse_track(tra / "man_track.txt")
     frames = sorted(tra.glob("man_track*.tif"))
@@ -125,7 +125,7 @@ def calibrate_gate(ds: Path, seq: str):
     cal = {"n_divisions": int(len(r)),
            "daughter_ratio_p5_p50_p95": [float(np.percentile(r, q)) for q in (5, 50, 95)] if len(r) else None,
            "mass_ratio_p5_p50_p95": [float(np.percentile(m, q)) for q in (5, 50, 95)] if len(m) else None}
-    # ambang = rentang p5-p95 yang diperlebar 10%
+    # thresholds = p5-p95 range widened by 10%
     if len(r):
         cal["ratio_max"] = float(np.percentile(r, 95) * 1.1)
         cal["mass_min"] = float(np.percentile(m, 5) * 0.9)
@@ -135,11 +135,11 @@ def calibrate_gate(ds: Path, seq: str):
     return cal
 
 
-ORIGINAL_GATE = {"ratio_max": 1.35, "ratio_min": 0.75, "mass_min": 0.85, "mass_max": 1.15, "source": "mitosis_ilp.py asli (+/-15%)"}
+ORIGINAL_GATE = {"ratio_max": 1.35, "ratio_min": 0.75, "mass_min": 0.85, "mass_max": 1.15, "source": "original mitosis_ilp.py (+/-15%)"}
 
 
 def gate_penalty(vp, v1, v2, cal, hard=False):
-    """Kembalikan penalti (soft) atau None bila ditolak (hard)."""
+    """Return a soft penalty, or None when rejected (hard mode)."""
     ratio = max(v1, v2) / max(min(v1, v2), 1e-6)
     mass = (v1 + v2) / max(vp, 1e-6)
     viol = max(0.0, ratio - cal["ratio_max"]) / cal["ratio_max"] + \
@@ -151,7 +151,7 @@ def gate_penalty(vp, v1, v2, cal, hard=False):
 
 # ------------------------------------------------------------------ trackers
 def greedy_pair(c0, c1, max_dist, div_dist, gate_cal, use_gate):
-    """Port setia dari AdvancedMitosisILPSolver.solve_frame_pair (greedy)."""
+    """Faithful port of AdvancedMitosisILPSolver.solve_frame_pair (greedy baseline)."""
     if not c0 or not c1:
         return [], []
     P0 = np.array([[c["x"], c["y"], c["z"]] for c in c0]); P1 = np.array([[c["x"], c["y"], c["z"]] for c in c1])
@@ -173,10 +173,10 @@ def greedy_pair(c0, c1, max_dist, div_dist, gate_cal, use_gate):
 
 
 def ilp_pair(c0, c1, max_dist, div_dist, gate_cal, use_gate, c_app=30.0, c_div=10.0, w_gate=40.0):
-    """Network-flow ILP per pasangan frame (scipy.optimize.milp / HiGHS):
-    variabel biner link x_ij, divisi y_i(j1,j2), appear a_j, disappear d_i.
-    Kendala: setiap sel t0 tepat satu nasib; setiap sel t1 tepat satu asal.
-    Gate biologis masuk sebagai BIAYA LUNAK (w_gate * pelanggaran), bukan veto keras."""
+    """Frame-pair network-flow ILP (scipy.optimize.milp / HiGHS):
+    binary variables link x_ij, division y_i(j1,j2), appear a_j, disappear d_i.
+    Constraints: every cell at t0 takes exactly one fate; every cell at t1 has exactly one origin.
+    The biological gate enters as a SOFT COST (w_gate * violation), not a hard veto."""
     from scipy.optimize import milp, LinearConstraint, Bounds
     n0, n1 = len(c0), len(c1)
     if n0 == 0 or n1 == 0:
@@ -234,7 +234,7 @@ def run_config(ds, seq, detect, tracker, gate_cal, out_root, max_dist=20.0, div_
     raw_frames = sorted((ds / seq).glob("t*.tif"))
     n = len(gt_frames)
     res_dir = out_root / f"{seq}_{detect}_{tracker}_RES"
-    det_dir = out_root / f"{seq}_{detect}_DET"  # mask deteksi mentah, terpisah agar py-ctcmetrics hanya melihat mask hasil
+    det_dir = out_root / f"{seq}_{detect}_DET"  # raw detection masks kept separate so py-ctcmetrics only sees result masks
     for d in (res_dir,):
         if d.exists():
             shutil.rmtree(d)
@@ -248,7 +248,7 @@ def run_config(ds, seq, detect, tracker, gate_cal, out_root, max_dist=20.0, div_
         if detect == "gt":
             mask = tifffile.imread(gt_frames[t])
         else:
-            det_path = det_dir / f"det{t:03d}.tif"  # cache: deteksi tidak bergantung tracker
+            det_path = det_dir / f"det{t:03d}.tif"  # cache: detection does not depend on the tracker
             if det_path.exists():
                 mask = tifffile.imread(det_path)
             else:
@@ -284,9 +284,9 @@ def run_config(ds, seq, detect, tracker, gate_cal, out_root, max_dist=20.0, div_
     from ctc_metrics import evaluate_sequence
     m = evaluate_sequence(str(res_dir), str(gt_tra.parent), metrics=["DET", "TRA"])
 
-    # ---- mitosis P/R: cocokkan anak prediksi ke label GT (overlap maksimum) pada frame t
+    # ---- mitosis P/R: match predicted daughters to GT labels (max overlap) at frame t
     gt_tr = parse_track(gt_tra / "man_track.txt")
-    # event GT = induk dengan >=2 anak; frame event = frame mulai anak paling awal
+    # GT event = parent with >=2 daughters; event frame = earliest daughter start frame
     gt_events = {}
     for cid, (s, e, p) in gt_tr.items():
         if p != 0:
@@ -325,12 +325,12 @@ def main():
     ap.add_argument("--seqs", nargs="+", default=["01", "02"])
     ap.add_argument("--detect", nargs="+", default=["gt", "otsu"])
     ap.add_argument("--trackers", nargs="+", default=list(TRACKERS))
-    ap.add_argument("--calib_seq", default="02", help="sekuens untuk kalibrasi gate (dievaluasi juga, dilaporkan terpisah)")
+    ap.add_argument("--calib_seq", default="02", help="sequence used to calibrate the gate (also evaluated; in-sample for the gate)")
     args = ap.parse_args()
     ds = ensure_dataset(Path(args.data)); out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
 
     cal = calibrate_gate(ds, args.calib_seq)
-    log("[gate] kalibrasi dari GT", args.calib_seq, json.dumps(cal))
+    log("[gate] calibrated from GT", args.calib_seq, json.dumps(cal))
     rows = []
     for seq in args.seqs:
         for det in args.detect:
@@ -341,18 +341,18 @@ def main():
                 except Exception as ex:  # noqa
                     r = {"seq": seq, "detect": det, "tracker": tr, "error": repr(ex)}
                 log("      ", r); rows.append(r)
-    # juga: gate ASLI (+/-15%) untuk menunjukkan kenapa mitosis = 0
+    # also: the ORIGINAL (+/-15%) gate, to show why mitosis = 0 in the earlier draft
     for seq in args.seqs:
         if "gt" in args.detect and "greedy_gate" in args.trackers:
             r = run_config(ds, seq, "gt", "greedy_gate", ORIGINAL_GATE, out); r["tracker"] = "greedy_gate_ORIGINAL(+/-15%)"; rows.append(r); log("      ", r)
 
     report = {"dataset": "CTC Fluo-N3DH-CHO (training, 01 & 02)", "spacing_um_zyx": SPACING, "dt_min": DT_MIN,
               "gate_calibration": cal, "gate_original": ORIGINAL_GATE, "rows": rows,
-              "catatan": "detect=gt: deteksi sempurna (DET=1 by construction), mengukur linking saja. detect=otsu: label-free, tanpa GT. "
-                         f"Gate dikalibrasi dari sekuens {args.calib_seq}; angka pada sekuens itu bukan uji independen."}
+              "note": "detect=gt: perfect detections (DET=1 by construction), measures linking only. detect=otsu: label-free, no GT. "
+                         f"Gate calibrated on sequence {args.calib_seq}; rows of that sequence are not an independent test."}
     (out / "ablation.json").write_text(json.dumps(report, indent=2))
-    md = ["# Ablasi Fluo-N3DH-CHO (py-ctcmetrics)", "", f"Gate kalibrasi: `{json.dumps(cal)}`", "",
-          "| seq | deteksi | tracker | DET | TRA | mitosis pred/GT | TP | P | R | F1 | s/vol |", "|---|---|---|---|---|---|---|---|---|---|---|"]
+    md = ["# Ablation on Fluo-N3DH-CHO (py-ctcmetrics)", "", f"Gate calibration: `{json.dumps(cal)}`", "",
+          "| seq | detect | tracker | DET | TRA | mitosis pred/GT | TP | P | R | F1 | s/vol |", "|---|---|---|---|---|---|---|---|---|---|---|"]
     for r in rows:
         if "error" in r:
             md.append(f"| {r['seq']} | {r['detect']} | {r['tracker']} | ERROR {r['error'][:60]} |||||||||"); continue

@@ -13,7 +13,8 @@
 > **Labelling convention used throughout.** Every quantitative statement carries one of two tags:
 > **[Measured]** — produced by `evaluate.py` on public data (`results/ablation.json`).
 > **[Design]** — a physics-based design parameter or simulation; **no performance is claimed**.
-> A previous draft of this project contained performance figures that could not be reproduced. They were audited claim-by-claim (`docs/AUDIT_KLAIM.md`) and removed. Nothing below is carried over from that draft unless it was re-measured.
+> A previous draft of this project contained performance figures that could not be reproduced. They were audited claim-by-claim (`docs/AUDIT_LOG.md`) and removed. Nothing below is carried over from that draft unless it was re-measured.
+> Full technical report with embedded figures: `docs/TECHNICAL_REPORT.md` · one-page abstract: `docs/ABSTRACT.md` · figures: `docs/figures/`.
 
 ---
 
@@ -52,7 +53,17 @@ The first two are algorithmic and are addressed and measured here. The third req
 | Provider / licence | Dr. J. Essers, Erasmus MC Rotterdam; CTC terms of use; cite Ulman, Maška et al., *Nat Methods* 14:1141–1152 (2017), doi:10.1038/nmeth.4473 |
 | Download | performed by `evaluate.py` from `data.celltrackingchallenge.net` |
 
-No private, clinical or personal data are used. No real OoC recordings and no real acoustic recordings are used; synthetic signals are labelled **[Design]**.
+**Data sources used for all measured results (complete list — nothing else is used):**
+
+| Resource | URL | Role |
+|---|---|---|
+| Fluo-N3DH-CHO training set (zip, ≈108 MB) | http://data.celltrackingchallenge.net/training-datasets/Fluo-N3DH-CHO.zip | the only dataset; downloaded automatically by `evaluate.py` |
+| Dataset description page (imaging metadata, provider) | https://celltrackingchallenge.net/3d-datasets/ | voxel size, Δt, microscope, provenance |
+| CTC terms of use & citation policy | https://celltrackingchallenge.net/ | licence |
+| Official metrics implementation `py-ctcmetrics` | https://pypi.org/project/py-ctcmetrics/ (source: https://github.com/CellTrackingChallenge/py-ctcmetrics) | DET / TRA computation |
+| Reference paper for the metrics and dataset | https://doi.org/10.1038/nmeth.4473 | citation |
+
+No private, clinical or personal data are used. No real OoC recordings and no real acoustic recordings are used; synthetic signals are labelled **[Design]** and are generated in-code (`src/utils/synthetic_data.py`), not downloaded.
 
 ---
 
@@ -141,6 +152,10 @@ All numbers from `results/ablation.json`; official DET/TRA via `py-ctcmetrics`; 
 | 02 | ILP (± gate identical) | 0.9964 | 7 / 3 | 0 | 0 | 0 |
 | 02 | greedy + original ±15 % gate | 0.9987 | **0 / 3** | — | 0 | 0 |
 
+![Fig. 1 — TRA, GT detections](https://raw.githubusercontent.com/syehsyoh-dokling/Auracell4D/main/docs/figures/fig1_tra_gt_detections.png)
+![Fig. 2 — divisions proposed](https://raw.githubusercontent.com/syehsyoh-dokling/Auracell4D/main/docs/figures/fig2_false_divisions.png)
+![Fig. 5 — same real frame, greedy vs ILP](https://raw.githubusercontent.com/syehsyoh-dokling/Auracell4D/main/docs/figures/fig5_frame_overlay.png)
+
 ### 5.2 Robustness with label-free detection (Otsu + watershed)
 
 | seq | DET | tracker | TRA | predicted divisions |
@@ -148,10 +163,13 @@ All numbers from `results/ablation.json`; official DET/TRA via `py-ctcmetrics`; 
 | 01 | 0.401 | greedy no gate / greedy gate / ILP no gate / **ILP + gate** | 0.365 / 0.391 / 0.389 / **0.392** | 578 / 19 / 176 / 63 |
 | 02 | 0.526 | greedy no gate / greedy gate / ILP no gate / **ILP + gate** | 0.476 / 0.509 / 0.509 / **0.512** | 495 / 13 / 138 / 32 |
 
+![Fig. 3 — Otsu robustness](https://raw.githubusercontent.com/syehsyoh-dokling/Auracell4D/main/docs/figures/fig3_otsu_robustness.png)
+![Fig. 4 — gate calibration finding](https://raw.githubusercontent.com/syehsyoh-dokling/Auracell4D/main/docs/figures/fig4_gate_calibration.png)
+
 ### 5.3 What the results say
 1. **ILP vs greedy is the measurable contribution:** +0.05–0.07 TRA and 20–35 × fewer false divisions at equal detections; the ordering holds under poor detections too.
 2. **The soft gate helps a little, consistently** (TRA +0.0006 to +0.003; false divisions 8→5, 176→63, 138→32).
-3. **The old hard gate's TRA 0.998 is an artefact**: zero divisions proposed, all 7 true ones missed. We report it to document the failure mode.
+3. **Failure analysis.** Across the 18-configuration ablation (4 trackers × 2 detection modes × 2 sequences, including the earlier gate), the previous draft's ±15 % mass gate appeared to reach TRA 0.998 — because it rejected every true division (0 of 7): CTC TRA masks are uniform-size markers, so the daughter/parent mass ratio is always 2.0, never 1.0. We keep the row in the table and report it as a failure mode.
 4. **Mitosis is unsolved here**: best F1 0.22; 0 on seq 02; only 7 GT events in total, so these numbers are not statistically stable.
 5. **Detection is the bottleneck for label-free use**: DET 0.40/0.53. A learned segmenter is the obvious next step; the tracker cannot compensate.
 6. Runtime 0.11–0.15 s/volume (CPU) on small 5-slice volumes; not a real-time claim.
@@ -183,6 +201,8 @@ All numbers from `results/ablation.json`; official DET/TRA via `py-ctcmetrics`; 
 4. Operator-in-the-loop live mode; only then firmware.
 
 ---
+
+![GUI Step 4 — measured-results panel](https://raw.githubusercontent.com/syehsyoh-dokling/Auracell4D/main/docs/figures/gui_step4.png)
 
 ## 9. Reproduction
 ```bash

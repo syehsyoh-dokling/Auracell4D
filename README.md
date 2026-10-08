@@ -62,9 +62,16 @@ Opening `gui/index.html` directly as a file still works for the simulations, but
 
 ## Audit trail
 
-`docs/AUDIT_KLAIM.md` records the claim-by-claim audit of the earlier draft (46 claims; what was removed and why), with raw results in `audit/`.
+`docs/AUDIT_LOG.md` records the claim-by-claim audit of the earlier draft (46 claims; what was removed and why), with raw results in `audit/`.
 
-## Data & licenses
+## Data & licenses (complete list of external sources)
 
-- Cell Tracking Challenge, Fluo-N3DH-CHO (Dr. J. Essers, Erasmus MC) — CTC terms of use; cite Ulman, Maška et al., *Nat Methods* 14:1141–1152 (2017), doi:10.1038/nmeth.4473.
-- No personal, clinical or restricted data are used.
+| Resource | URL |
+|---|---|
+| Fluo-N3DH-CHO training set (the only dataset; auto-downloaded by `evaluate.py`, ≈108 MB) | http://data.celltrackingchallenge.net/training-datasets/Fluo-N3DH-CHO.zip |
+| Dataset page (metadata, provider Dr. J. Essers, Erasmus MC) | https://celltrackingchallenge.net/3d-datasets/ |
+| CTC terms of use | https://celltrackingchallenge.net/ |
+| Official metrics `py-ctcmetrics` | https://pypi.org/project/py-ctcmetrics/ · https://github.com/CellTrackingChallenge/py-ctcmetrics |
+| Citation: Ulman, Maška et al., *Nat Methods* 14:1141–1152 (2017) | https://doi.org/10.1038/nmeth.4473 |
+
+No personal, clinical or restricted data are used. Synthetic acoustic/spectral signals are generated in-code (`src/utils/synthetic_data.py`), not downloaded.
