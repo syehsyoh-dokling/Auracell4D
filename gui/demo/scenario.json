@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "title": "AuraCell 4D — scripted monitoring scenario (DESIGN MODE B, SIMULATION)",
+    "note": "Every value here is scripted to illustrate the decision table of writeup Section 3.3. No hardware, no real recording.",
+    "cartridge": {"width_um": 1000, "height_um": 100, "length_mm": 25, "viscosity_pa_s": 0.001},
+    "flow_ul_min": 10.0,
+    "tau_baseline_dyn_cm2": 1.0,
+    "dp_baseline_pa": 480,
+    "imaging_interval_s": 9.5,
+    "note_imaging": "In the demo 1 s of wall-clock = 1 min of experiment; frames every 9.5 s represent the 9.5-min CTC cadence.",
+    "thresholds": {
+      "tau_flag": 15, "tau_stop": 30,
+      "dp_flag_x": 1.5, "dp_stop_x": 2.5,
+      "burst_band_khz": [80, 180], "burst_sigma": 3.5,
+      "bursts_flag_per_10min": 3, "bursts_stop_per_10min": 10
+    },
+    "duration_s": 130
+  },
+  "cells": [
+    {"id": 1, "x": 0.18, "y": 0.30}, {"id": 2, "x": 0.32, "y": 0.62}, {"id": 3, "x": 0.47, "y": 0.25},
+    {"id": 4, "x": 0.58, "y": 0.70}, {"id": 5, "x": 0.71, "y": 0.40}, {"id": 6, "x": 0.84, "y": 0.66},
+    {"id": 7, "x": 0.25, "y": 0.82}, {"id": 8, "x": 0.90, "y": 0.22}, {"id": 9, "x": 0.08, "y": 0.58},
+    {"id": 10, "x": 0.62, "y": 0.12}
+  ],
+  "events": [
+    {"t": 0,   "type": "info",    "msg": "Perfusion started: 10 µL/min → τ = 6µQ/(w·h²) = 1.00 dyn/cm² (CONTINUE band 0.5–15)"},
+    {"t": 0,   "type": "info",    "msg": "Acoustic channel: continuous, 250 kS/s, watching 80–180 kHz (Minnaert band). Imaging: periodic z-stack every 9.5 min."},
+    {"t": 9.5, "type": "frame",   "frame": 1},
+    {"t": 12,  "type": "burst",   "khz": 109.6, "sigma": 6.2, "radius_um": 30, "msg": "Acoustic burst 109.6 kHz (6.2 σ) → Minnaert radius ≈ 30 µm bubble at inlet"},
+    {"t": 12,  "type": "flag",    "rule": "burst", "msg": "FLAG: timestamp T logged; extra z-stack requested within 60 s"},
+    {"t": 14,  "type": "snapshot","msg": "Event-triggered snapshot acquired (T + 2 min)"},
+    {"t": 14,  "type": "vanish",  "cells": [3, 10], "msg": "Tracker: tracks 3 and 10 end within ±1 frame of T without a division"},
+    {"t": 14,  "type": "artefact","cells": [3, 10], "msg": "→ marked MECHANICAL-ARTEFACT CANDIDATES; excluded from drug-death count (reason attached)"},
+    {"t": 19,  "type": "frame",   "frame": 2},
+    {"t": 28.5,"type": "frame",   "frame": 3},
+    {"t": 30,  "type": "clog",    "dp_x": 1.2, "msg": "ΔP rising: 1.2× baseline (watch)"},
+    {"t": 38,  "type": "frame",   "frame": 4},
+    {"t": 40,  "type": "clog",    "dp_x": 1.7, "msg": "ΔP 1.7× baseline (≈ 50 % occlusion ≙ 2.3×)"},
+    {"t": 40,  "type": "flag",    "rule": "dp_flag", "msg": "FLAG: pressure drop 1.5–2.5× baseline → operator notified, snapshot requested"},
+    {"t": 47.5,"type": "frame",   "frame": 5},
+    {"t": 52,  "type": "clog",    "dp_x": 2.6, "msg": "ΔP 2.6× baseline and rising > 20 %/min"},
+    {"t": 52,  "type": "stop",    "rule": "dp_stop", "msg": "STOP RECOMMENDED: membrane risk. Software does not control the pump — operator decides."},
+    {"t": 58,  "type": "operator","flow_ul_min": 4.0, "msg": "Operator reduced flow to 4 µL/min → τ = 0.40 dyn/cm²; ΔP relaxing"},
+    {"t": 57,  "type": "frame",   "frame": 6},
+    {"t": 64,  "type": "clog",    "dp_x": 1.3, "msg": "ΔP back to 1.3× baseline → CONTINUE"},
+    {"t": 64,  "type": "resume",  "msg": "State: CONTINUE (flag history kept in audit log)"},
+    {"t": 66.5,"type": "frame",   "frame": 7},
+    {"t": 76,  "type": "frame",   "frame": 8},
+    {"t": 78,  "type": "divide",  "parent": 5, "daughters": [11, 12], "penalty": 0.0, "msg": "ILP: division 5 → (11, 12), gate penalty 0.00 → PASS"},
+    {"t": 85.5,"type": "frame",   "frame": 9},
+    {"t": 88,  "type": "divide",  "parent": 2, "daughters": [13, 14], "penalty": 0.42, "msg": "ILP: division 2 → (13, 14) chosen despite gate penalty 0.42 (daughter ratio 1.6) → FLAG FOR REVIEW"},
+    {"t": 88,  "type": "flag",    "rule": "gate", "msg": "FLAG: division shown to researcher with both daughter volumes"},
+    {"t": 95,  "type": "frame",   "frame": 10},
+    {"t": 98,  "type": "death",   "cells": [7], "msg": "Track 7 ends; no acoustic/pressure event within ±1 frame → counted as drug-associated death"},
+    {"t": 104.5,"type": "frame",  "frame": 11},
+    {"t": 110, "type": "burst",   "khz": 142.0, "sigma": 4.1, "radius_um": 23, "msg": "Acoustic burst 142 kHz (4.1 σ) ≈ 23 µm bubble"},
+    {"t": 110, "type": "flag",    "rule": "burst", "msg": "FLAG: 2nd burst in 10 min (notice at ≥ 3); snapshot requested"},
+    {"t": 114, "type": "frame",   "frame": 12},
+    {"t": 114, "type": "info",    "msg": "No track ended near this event → nothing excluded"},
+    {"t": 122, "type": "export",  "msg": "Audit export: 10 tracks, 2 divisions (1 PASS, 1 FLAG), 2 artefact candidates excluded, 1 drug-associated death, 4 FLAG + 1 STOP recommendation"},
+    {"t": 128, "type": "loop",    "msg": "Researcher review → next dose → loop back to perfusion"}
+  ]
+}

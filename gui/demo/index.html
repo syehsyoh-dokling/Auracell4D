@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AuraCell 4D — Demo Pages</title>
+<style>
+  :root{--bg:#0b1020;--panel:#121a2e;--panel2:#18223a;--line:#263251;--txt:#e6ecf5;--mut:#8ea0bd;--cyan:#22d3ee;--teal:#14b8a6;--amber:#f59e0b;--red:#ef4444;--green:#22c55e;--purple:#a78bfa;--mono:ui-monospace,Consolas,"Cascadia Mono",monospace}
+  *{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:Inter,"Segoe UI",system-ui,sans-serif;overflow:hidden}
+  #stage{width:100vw;height:100vh;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--line);background:#0d1326}
+  header .brand{display:flex;align-items:center;gap:12px}.logo{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--cyan),#2563eb);display:grid;place-items:center;font-weight:900;font-size:13px;color:#001}
+  .badge{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid;letter-spacing:.3px;font-weight:700}
+  .b-sim{color:var(--amber);border-color:#7c5a12;background:#2a1f06}.b-meas{color:var(--green);border-color:#1f6a37;background:#07200f}.b-des{color:var(--purple);border-color:#4c3c8a;background:#1a1530}
+  nav{display:flex;gap:6px}nav button{background:var(--panel);border:1px solid var(--line);color:var(--mut);padding:7px 12px;border-radius:9px;font-size:12px;cursor:pointer}nav button.on{background:var(--cyan);color:#001;font-weight:800;border-color:var(--cyan)}
+  main{flex:1;position:relative}.page{position:absolute;inset:0;padding:22px 28px;display:none}.page.on{display:block}
+  h1{font-size:28px;margin:0 0 4px}h2{font-size:15px;color:var(--mut);font-weight:500;margin:0 0 16px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .mono{font-family:var(--mono)}.mut{color:var(--mut)}.small{font-size:12px}
+  footer{padding:8px 28px;border-top:1px solid var(--line);font-size:11px;color:var(--mut);display:flex;justify-content:space-between}
+  kbd{background:#1f2a44;border:1px solid #33446b;border-radius:5px;padding:1px 6px;font-family:var(--mono);font-size:11px}
+
+  /* ---- page 1 workflow ---- */
+  .flow{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;margin-top:10px}
+  .step{position:relative;border-radius:14px;padding:14px 12px;border:1px solid var(--line);background:var(--panel);min-height:150px;transition:transform .35s,box-shadow .35s,border-color .35s;opacity:.55}
+  .step.eco{border-top:4px solid #475569}.step.ours{border-top:4px solid var(--cyan)}
+  .step.active{opacity:1;transform:translateY(-8px) scale(1.03);box-shadow:0 12px 40px rgba(34,211,238,.18);border-color:var(--cyan)}
+  .step .n{font-size:11px;color:var(--mut);font-weight:700}.step .t{font-size:14px;font-weight:800;margin:4px 0 6px;line-height:1.2}.step .who{font-size:10px;padding:2px 7px;border-radius:999px;display:inline-block}
+  .who.e{background:#283142;color:#9fb0cc}.who.o{background:#083344;color:var(--cyan)}
+  .step .icon{height:46px;margin-top:8px}
+  .track{position:relative;height:6px;background:#1e2a44;border-radius:3px;margin:18px 6px 6px}.track .bar{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,var(--teal),var(--cyan));border-radius:3px;transition:width .5s}
+  .loop{position:absolute;right:0;top:-26px;font-size:11px;color:var(--teal)}
+  .desc{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:16px}
+  .desc .big{font-size:20px;font-weight:800;margin-bottom:6px}.desc p{margin:0;font-size:14px;line-height:1.5;color:#cbd5e1}
+  .legend{display:flex;gap:14px;font-size:12px;color:var(--mut);margin-top:8px}.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px}
+
+  /* ---- page 2 monitor ---- */
+  .mon{display:grid;grid-template-columns:1.15fr .95fr 1fr;grid-template-rows:auto 1fr auto;gap:12px;height:calc(100% - 50px)}
+  .kpis{grid-column:1/4;display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}.kpi .l{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}.kpi .v{font-family:var(--mono);font-size:22px;font-weight:800;margin-top:2px;transition:color .3s}.kpi .s{font-size:10px;color:var(--mut)}
+  .state-CONTINUE{color:var(--green)}.state-FLAG{color:var(--amber)}.state-STOP{color:var(--red)}
+  .kpi.pulse{animation:pulse .6s 3}@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(245,158,11,.6)}100%{box-shadow:0 0 0 14px rgba(245,158,11,0)}}
+  canvas{width:100%;display:block;background:#0a0f1f;border-radius:10px;border:1px solid #1b2540}
+  .ptitle{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;display:flex;justify-content:space-between}
+  .log{height:100%;overflow:hidden;font-family:var(--mono);font-size:11.5px;line-height:1.45}.log div{padding:3px 0;border-bottom:1px dashed #1e2a44}.log .fl{color:var(--amber)}.log .st{color:var(--red);font-weight:700}.log .ok{color:var(--green)}.log .in{color:#9fb0cc}.log .ar{color:var(--purple)}
+  table{width:100%;border-collapse:collapse;font-size:11.5px}th{color:var(--mut);text-align:left;font-weight:600;padding:4px 6px;border-bottom:1px solid var(--line)}td{padding:4px 6px;border-bottom:1px solid #1a2440;font-family:var(--mono)}
+  .pill{padding:1px 7px;border-radius:999px;font-size:10px;font-weight:700}.p-alive{background:#083344;color:var(--cyan)}.p-art{background:#2a1f06;color:var(--amber)}.p-dead{background:#3a0d0d;color:#fca5a5}.p-div{background:#07200f;color:var(--green)}.p-rev{background:#1a1530;color:var(--purple)}
+  .rules{font-size:11px}.rules div{padding:5px 8px;border-radius:8px;margin-bottom:4px;border:1px solid transparent;color:var(--mut)}.rules div.hot{border-color:var(--amber);background:#2a1f06;color:#fde68a}.rules div.hot.stop{border-color:var(--red);background:#3a0d0d;color:#fecaca}
+  .timeline{grid-column:1/4;display:flex;align-items:center;gap:12px;font-size:12px}.timeline input{flex:1}
+  .chip{position:absolute;border-radius:50%;border:2px solid var(--cyan);transition:all .5s}.chipwrap{position:relative;height:100%}
+
+  /* ---- page 3 results ---- */
+  .res{display:grid;grid-template-columns:1fr 1fr;gap:16px;height:calc(100% - 60px)}
+  .bars{display:flex;flex-direction:column;gap:12px;justify-content:center;height:100%}.bar{display:grid;grid-template-columns:150px 1fr 90px;align-items:center;gap:12px;font-size:14px}.bar .fill{height:30px;border-radius:7px;background:#223052;position:relative;overflow:hidden}.bar .fill i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:7px;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}.bar .val{font-family:var(--mono);font-weight:800;font-size:18px;text-align:right}
+  .big-num{font-family:var(--mono);font-size:64px;font-weight:900;line-height:1}.cap{font-size:12px;color:var(--mut)}
+
+  /* ---- page 4 ---- */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px;height:calc(100% - 60px)}.two ul{line-height:1.8;font-size:15px;margin:8px 0 0 18px;padding:0}
+</style>
+</head>
+<body>
+<div id="stage">
+<header>
+  <div class="brand"><div class="logo">A4D</div><div><div style="font-weight:800">AuraCell 4D</div><div class="small mut">Physics-gated lineage tracking for organ-on-a-chip time-lapse</div></div></div>
+  <nav>
+    <button data-p="1" class="on">1 · Workflow</button><button data-p="2">2 · Live monitor (simulation)</button><button data-p="3">3 · Measured results</button><button data-p="4">4 · Measured vs Design</button>
+  </nav>
+  <div id="pageBadge"><span class="badge b-des">DESIGN · animated explainer</span></div>
+</header>
+
+<main>
+<!-- ================= PAGE 1: WORKFLOW ================= -->
+<section class="page on" id="p1">
+  <h1>Where AuraCell 4D sits in the experiment</h1>
+  <h2>Grey = existing ecosystem (fabrication, wet lab, instrument). Cyan = this project. The loop never leaves the researcher out.</h2>
+  <div class="flow" id="flow"></div>
+  <div class="track"><div class="bar" id="flowBar"></div><div class="loop">↺ loop: next dose / next cartridge</div></div>
+  <div class="desc">
+    <div class="panel"><div class="big" id="fTitle"></div><p id="fText"></p></div>
+    <div class="panel"><div class="ptitle">What is actually produced at this stage</div><p id="fOut" style="font-size:13px;color:#cbd5e1;line-height:1.5"></p>
+      <div class="legend"><span><i class="sw" style="background:#475569"></i>ecosystem</span><span><i class="sw" style="background:var(--cyan)"></i>AuraCell 4D</span><span><i class="sw" style="background:var(--green)"></i>[Measured] today</span><span><i class="sw" style="background:var(--purple)"></i>[Design]</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAGE 2: LIVE MONITOR ================= -->
+<section class="page" id="p2">
+  <div style="display:flex;justify-content:space-between;align-items:baseline"><h1 style="font-size:22px">Live monitor — mode B <span class="mut" style="font-size:14px;font-weight:500">(scripted scenario from <code>scenario.json</code>; 1 s = 1 experiment-minute)</span></h1><span class="badge b-sim">SIMULATION · no hardware, no real recording</span></div>
+  <div class="mon">
+    <div class="kpis">
+      <div class="kpi"><div class="l">State</div><div class="v state-CONTINUE" id="kState">CONTINUE</div><div class="s" id="kStateS">all rules in green band</div></div>
+      <div class="kpi"><div class="l">Flow Q</div><div class="v" id="kQ">10.0</div><div class="s">µL/min · operator-set</div></div>
+      <div class="kpi"><div class="l">Wall shear τ</div><div class="v" id="kTau">1.00</div><div class="s">dyn/cm² · 6µQ/(w·h²) · flag &gt;15 · stop &gt;30</div></div>
+      <div class="kpi"><div class="l">ΔP / baseline</div><div class="v" id="kDp">1.00×</div><div class="s" id="kDpS">480 Pa · flag ≥1.5× · stop ≥2.5×</div></div>
+      <div class="kpi"><div class="l">Acoustic 80–180 kHz</div><div class="v" id="kAc">0.9 σ</div><div class="s" id="kAcS">event at &gt;3.5 σ · bursts/10 min: 0</div></div>
+      <div class="kpi"><div class="l">Imaging</div><div class="v" id="kFrame">t 000</div><div class="s" id="kFrameS">periodic z-stack every 9.5 min</div></div>
+      <div class="kpi"><div class="l">Counts</div><div class="v" id="kCount" style="font-size:16px">10 / 0 / 0 / 0</div><div class="s">alive / div / artefact-excl / drug-death</div></div>
+    </div>
+
+    <div class="panel"><div class="ptitle"><span>Acoustic — continuous stream (inlet piezo)</span><span id="acTag" class="mono">baseline</span></div><canvas id="cAc" height="150"></canvas>
+      <div class="ptitle" style="margin-top:8px"><span>Band energy 60–200 kHz (Minnaert: 20 µm→164 kHz · 30 µm→109.6 kHz · 50 µm→66 kHz)</span></div><canvas id="cBand" height="110"></canvas></div>
+
+    <div class="panel"><div class="ptitle"><span>Pressure drop ΔP (× baseline) and shear τ</span><span class="mono">rolling 60 min</span></div><canvas id="cDp" height="150"></canvas>
+      <div class="ptitle" style="margin-top:8px"><span>Chamber (periodic frames) — circles: tracked nuclei</span><span id="frameTag" class="mono">frame 0</span></div><div class="chipwrap" style="height:112px"><canvas id="cCells" height="112"></canvas></div></div>
+
+    <div class="panel" style="display:flex;flex-direction:column;gap:8px;min-height:0">
+      <div class="ptitle"><span>Event log (audit trail)</span><span class="mono" id="clock">00:00</span></div>
+      <div class="log" id="log" style="flex:1"></div>
+      <div class="ptitle"><span>Decision table — active rule highlighted</span></div>
+      <div class="rules" id="rules">
+        <div data-r="tau">τ: continue 0.5–15 · FLAG 15–30 · STOP &gt;30 dyn/cm²</div>
+        <div data-r="dp_flag">ΔP: FLAG 1.5–2.5× baseline (50 % occlusion ≈ 2.3×)</div>
+        <div data-r="dp_stop">ΔP: STOP &gt;2.5× or rising &gt;20 %/min (membrane risk)</div>
+        <div data-r="burst">Acoustic burst &gt;3.5 σ in 80–180 kHz → log T, extra snapshot; ≥3/10 min notify; ≥10 stop</div>
+        <div data-r="vanish">Track ends within ±1 frame of T → mechanical-artefact candidate, excluded from drug-death count</div>
+        <div data-r="gate">Division with gate penalty &gt;0 chosen by ILP → FLAG for review (daughter volumes shown)</div>
+      </div>
+    </div>
+
+    <div class="panel" style="grid-column:1/4;max-height:150px;overflow:hidden"><div class="ptitle"><span>Tracks</span><span class="mono mut">status is assigned by rule, never deleted</span></div>
+      <table><thead><tr><th>track</th><th>status</th><th>since</th><th>reason</th></tr></thead><tbody id="tbody"></tbody></table></div>
+
+    <div class="timeline"><button id="play" class="badge b-meas" style="cursor:pointer">▶ play</button><span class="mono" id="tl">0 / 130 min</span><input type="range" id="scrub" min="0" max="130" value="0" step="0.5"><span class="mut small">speed</span><select id="speed"><option value="1">1×</option><option value="2" selected>2×</option><option value="4">4×</option></select></div>
+  </div>
+</section>
+
+<!-- ================= PAGE 3: MEASURED ================= -->
+<section class="page" id="p3">
+  <div style="display:flex;justify-content:space-between;align-items:baseline"><h1>What we actually measured</h1><span class="badge b-meas">[MEASURED] · results/ablation.json · py-ctcmetrics</span></div>
+  <h2>Cell Tracking Challenge Fluo-N3DH-CHO, 2 × 92 frames, GT detections (DET = 1) — isolates linking quality. Reproduced identically on Colab and a local PC.</h2>
+  <div class="res">
+    <div class="panel"><div class="ptitle">TRA (official tracking score) — sequence 01 / 02</div><div class="bars" id="bars"></div></div>
+    <div style="display:grid;grid-template-rows:1fr 1fr;gap:16px">
+      <div class="panel" style="display:flex;flex-direction:column;justify-content:center"><div class="cap">false divisions proposed, seq 01 (true = 4)</div><div style="display:flex;align-items:baseline;gap:18px"><span class="big-num" style="color:#9aa4b2" id="n178">0</span><span style="font-size:28px" class="mut">→</span><span class="big-num" style="color:var(--teal)" id="n5">0</span></div><div class="cap">greedy baseline → ILP + soft gate</div></div>
+      <div class="panel" style="display:flex;flex-direction:column;justify-content:center"><div class="cap">stated as open limitations</div>
+        <div style="font-size:15px;line-height:1.7"><b style="color:var(--amber)">Mitosis F1 best 0.22</b> (only 7 GT events) · <b style="color:var(--amber)">label-free DET 0.40 / 0.53</b> (Otsu baseline) · dataset is conventional culture, not a chip · the earlier ±15 % gate scored TRA 0.998 by rejecting <b>every</b> true division — row kept in the table</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAGE 4: MEASURED VS DESIGN ================= -->
+<section class="page" id="p4">
+  <div style="display:flex;justify-content:space-between;align-items:baseline"><h1>Every number carries a label</h1><span class="badge b-des">closing</span></div>
+  <h2>So a reviewer always knows which is which.</h2>
+  <div class="two">
+    <div class="panel" style="border-color:#1f6a37"><div class="badge b-meas">[MEASURED] — exists, reproducible with one command</div>
+      <ul><li>Frame-pair network-flow ILP (link / divide / appear / disappear), HiGHS</li><li>Calibrated soft biological gate (volume ratio, mass conservation)</li><li>TRA 0.998 / 0.996 vs greedy 0.928 / 0.943 · false divisions 178 → 5</li><li>Label-free Otsu baseline: DET 0.40 / 0.53 (weak, reported)</li><li>Failure analysis of the earlier gate (0 of 7 divisions)</li><li>GUI Step 4 runs <code>evaluate.py</code> from a button; audit export</li></ul></div>
+    <div class="panel" style="border-color:#4c3c8a"><div class="badge b-des">[DESIGN] — specified, not yet validated on hardware</div>
+      <ul><li>Continuous inlet acoustics, 80–180 kHz Minnaert band, 3.5 σ events</li><li>Event-triggered extra snapshot within 60 s</li><li>CONTINUE / FLAG / STOP decision table on τ, ΔP, bursts</li><li>Mechanical-artefact candidates excluded <i>with the reason attached</i></li><li>Operator decides; no autonomous valve control</li><li>Roadmap: learned 3D segmenter → real OoC recording → hardware</li></ul></div>
+  </div>
+</section>
+</main>
+<footer><span>Navigate: <kbd>←</kbd> <kbd>→</kbd> pages · <kbd>space</kbd> play/pause on page 2 · <kbd>a</kbd> toggle workflow auto-advance · URL: <kbd>?page=2&amp;t=55&amp;play=1</kbd></span><span>github.com/syehsyoh-dokling/Auracell4D · demo pages for the video; nothing here is a measurement except page 3</span></footer>
+</div>
+
+<script id="scenarioInline" type="application/json">{"meta": {"title": "AuraCell 4D \u2014 scripted monitoring scenario (DESIGN MODE B, SIMULATION)", "note": "Every value here is scripted to illustrate the decision table of writeup Section 3.3. No hardware, no real recording.", "cartridge": {"width_um": 1000, "height_um": 100, "length_mm": 25, "viscosity_pa_s": 0.001}, "flow_ul_min": 10.0, "tau_baseline_dyn_cm2": 1.0, "dp_baseline_pa": 480, "imaging_interval_s": 9.5, "note_imaging": "In the demo 1 s of wall-clock = 1 min of experiment; frames every 9.5 s represent the 9.5-min CTC cadence.", "thresholds": {"tau_flag": 15, "tau_stop": 30, "dp_flag_x": 1.5, "dp_stop_x": 2.5, "burst_band_khz": [80, 180], "burst_sigma": 3.5, "bursts_flag_per_10min": 3, "bursts_stop_per_10min": 10}, "duration_s": 130}, "cells": [{"id": 1, "x": 0.18, "y": 0.3}, {"id": 2, "x": 0.32, "y": 0.62}, {"id": 3, "x": 0.47, "y": 0.25}, {"id": 4, "x": 0.58, "y": 0.7}, {"id": 5, "x": 0.71, "y": 0.4}, {"id": 6, "x": 0.84, "y": 0.66}, {"id": 7, "x": 0.25, "y": 0.82}, {"id": 8, "x": 0.9, "y": 0.22}, {"id": 9, "x": 0.08, "y": 0.58}, {"id": 10, "x": 0.62, "y": 0.12}], "events": [{"t": 0, "type": "info", "msg": "Perfusion started: 10 \u00b5L/min \u2192 \u03c4 = 6\u00b5Q/(w\u00b7h\u00b2) = 1.00 dyn/cm\u00b2 (CONTINUE band 0.5\u201315)"}, {"t": 0, "type": "info", "msg": "Acoustic channel: continuous, 250 kS/s, watching 80\u2013180 kHz (Minnaert band). Imaging: periodic z-stack every 9.5 min."}, {"t": 9.5, "type": "frame", "frame": 1}, {"t": 12, "type": "burst", "khz": 109.6, "sigma": 6.2, "radius_um": 30, "msg": "Acoustic burst 109.6 kHz (6.2 \u03c3) \u2192 Minnaert radius \u2248 30 \u00b5m bubble at inlet"}, {"t": 12, "type": "flag", "rule": "burst", "msg": "FLAG: timestamp T logged; extra z-stack requested within 60 s"}, {"t": 14, "type": "snapshot", "msg": "Event-triggered snapshot acquired (T + 2 min)"}, {"t": 14, "type": "vanish", "cells": [3, 10], "msg": "Tracker: tracks 3 and 10 end within \u00b11 frame of T without a division"}, {"t": 14, "type": "artefact", "cells": [3, 10], "msg": "\u2192 marked MECHANICAL-ARTEFACT CANDIDATES; excluded from drug-death count (reason attached)"}, {"t": 19, "type": "frame", "frame": 2}, {"t": 28.5, "type": "frame", "frame": 3}, {"t": 30, "type": "clog", "dp_x": 1.2, "msg": "\u0394P rising: 1.2\u00d7 baseline (watch)"}, {"t": 38, "type": "frame", "frame": 4}, {"t": 40, "type": "clog", "dp_x": 1.7, "msg": "\u0394P 1.7\u00d7 baseline (\u2248 50 % occlusion \u2259 2.3\u00d7)"}, {"t": 40, "type": "flag", "rule": "dp_flag", "msg": "FLAG: pressure drop 1.5\u20132.5\u00d7 baseline \u2192 operator notified, snapshot requested"}, {"t": 47.5, "type": "frame", "frame": 5}, {"t": 52, "type": "clog", "dp_x": 2.6, "msg": "\u0394P 2.6\u00d7 baseline and rising > 20 %/min"}, {"t": 52, "type": "stop", "rule": "dp_stop", "msg": "STOP RECOMMENDED: membrane risk. Software does not control the pump \u2014 operator decides."}, {"t": 58, "type": "operator", "flow_ul_min": 4.0, "msg": "Operator reduced flow to 4 \u00b5L/min \u2192 \u03c4 = 0.40 dyn/cm\u00b2; \u0394P relaxing"}, {"t": 57, "type": "frame", "frame": 6}, {"t": 64, "type": "clog", "dp_x": 1.3, "msg": "\u0394P back to 1.3\u00d7 baseline \u2192 CONTINUE"}, {"t": 64, "type": "resume", "msg": "State: CONTINUE (flag history kept in audit log)"}, {"t": 66.5, "type": "frame", "frame": 7}, {"t": 76, "type": "frame", "frame": 8}, {"t": 78, "type": "divide", "parent": 5, "daughters": [11, 12], "penalty": 0.0, "msg": "ILP: division 5 \u2192 (11, 12), gate penalty 0.00 \u2192 PASS"}, {"t": 85.5, "type": "frame", "frame": 9}, {"t": 88, "type": "divide", "parent": 2, "daughters": [13, 14], "penalty": 0.42, "msg": "ILP: division 2 \u2192 (13, 14) chosen despite gate penalty 0.42 (daughter ratio 1.6) \u2192 FLAG FOR REVIEW"}, {"t": 88, "type": "flag", "rule": "gate", "msg": "FLAG: division shown to researcher with both daughter volumes"}, {"t": 95, "type": "frame", "frame": 10}, {"t": 98, "type": "death", "cells": [7], "msg": "Track 7 ends; no acoustic/pressure event within \u00b11 frame \u2192 counted as drug-associated death"}, {"t": 104.5, "type": "frame", "frame": 11}, {"t": 110, "type": "burst", "khz": 142.0, "sigma": 4.1, "radius_um": 23, "msg": "Acoustic burst 142 kHz (4.1 \u03c3) \u2248 23 \u00b5m bubble"}, {"t": 110, "type": "flag", "rule": "burst", "msg": "FLAG: 2nd burst in 10 min (notice at \u2265 3); snapshot requested"}, {"t": 114, "type": "frame", "frame": 12}, {"t": 114, "type": "info", "msg": "No track ended near this event \u2192 nothing excluded"}, {"t": 122, "type": "export", "msg": "Audit export: 10 tracks, 2 divisions (1 PASS, 1 FLAG), 2 artefact candidates excluded, 1 drug-associated death, 4 FLAG + 1 STOP recommendation"}, {"t": 128, "type": "loop", "msg": "Researcher review \u2192 next dose \u2192 loop back to perfusion"}]}</script>
+<script>
+// ---------------------------------------------------------------- navigation
+const badges={1:'<span class="badge b-des">DESIGN · animated explainer</span>',2:'<span class="badge b-sim">SIMULATION · scripted JSON scenario</span>',3:'<span class="badge b-meas">[MEASURED] · official CTC metrics</span>',4:'<span class="badge b-des">closing</span>'};
+let page=1;
+function go(p){page=p;document.querySelectorAll('.page').forEach(s=>s.classList.toggle('on',s.id==='p'+p));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',+b.dataset.p===p));document.getElementById('pageBadge').innerHTML=badges[p];if(p===3)animateResults();}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(+b.dataset.p));
+window.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(Math.min(4,page+1));if(e.key==='ArrowLeft')go(Math.max(1,page-1));if(e.key===' '&&page===2){e.preventDefault();togglePlay();}if(e.key==='a')flowAuto=!flowAuto;});
+
+// ---------------------------------------------------------------- page 1 workflow
+const STEPS=[
+ {n:'1',t:'Cartridge fabrication',who:'e',title:'Cartridge fabrication (ecosystem)',text:'PDMS / glass microfluidic cartridge is produced in a cleanroom. AuraCell 4D only specifies the reference geometry it expects: channel 1000 × 100 µm, length 25 mm.',out:'A consumable cartridge. Nothing of ours runs yet.',icon:'chip'},
+ {n:'2',t:'Cell seeding & drug prep',who:'e',title:'Wet-lab biology (ecosystem)',text:'Cells or spheroids are loaded, the perfusion medium and the drug regimen are prepared by the lab. Still outside our software.',out:'A living culture inside the cartridge, a planned dose series.',icon:'cells'},
+ {n:'3',t:'Docking & sensor setup',who:'o',title:'Docking: where our configuration starts [Design]',text:'The cartridge is docked. The operator enters flow rate and geometry; AuraCell 4D computes the expected baselines: τ = 6µQ/(w·h²) = 1.0 dyn/cm² and the Hagen–Poiseuille ΔP baseline. The inlet piezo and the pressure sensor are registered.',out:'A baseline record: every later number is compared with it.',icon:'dock'},
+ {n:'4',t:'Perfusion + continuous listening',who:'o',title:'Perfusion starts — the acoustic channel never sleeps [Design]',text:'From this second on, the piezo stream is sampled continuously (≥250 kS/s). An energy envelope over 20 ms windows is compared with the rolling baseline; a burst above 3.5 σ in the 80–180 kHz Minnaert band is time-stamped as T.',out:'Timestamps of mechanical events, independent of the camera.',icon:'wave'},
+ {n:'5',t:'Periodic imaging',who:'e',title:'The microscope keeps its own cadence',text:'A 3-D z-stack is acquired every 5–15 minutes (9.5 min in our benchmark data). After an acoustic event, AuraCell 4D asks for one extra stack within 60 s, so the frame "just after" exists.',out:'A folder of time-lapse stacks, plus event-triggered snapshots.',icon:'cam'},
+ {n:'6',t:'Detect → ILP link → gate',who:'o',title:'The algorithm [Measured]',text:'Nuclei are detected; for each frame pair an integer linear program gives every nucleus exactly one fate and every nucleus exactly one origin. Biologically implausible divisions are not vetoed — they cost more. On public CTC data this lifts TRA from 0.928 to 0.998 and cuts false divisions 178 → 5.',out:'A lineage graph where every edge has a cost and every division a gate penalty.',icon:'graph'},
+ {n:'7',t:'Certificates & audit',who:'o',title:'PASS · FLAG · STOP — nothing is deleted',text:'Rules from the decision table attach a certificate to each event: a division with penalty → FLAG for review; a track ending right after T → mechanical-artefact candidate, excluded from the drug-death count with the reason written next to it; ΔP beyond 2.5× → STOP recommended to the operator.',out:'An audit JSON a reviewer or regulator can follow line by line.',icon:'cert'},
+ {n:'8',t:'Researcher review → loop',who:'e',title:'The human stays in the loop',text:'The scientist reviews only the flagged handful instead of the whole movie, confirms or overrides, records the dose–response point — and the next dose or the next cartridge starts the cycle again at stage 4.',out:'A dose–response count with every exclusion explained.',icon:'loop'}
+];
+const ICONS={
+ chip:'<svg viewBox="0 0 120 46" width="100%" height="46"><rect x="6" y="8" width="108" height="30" rx="8" fill="#1e293b" stroke="#64748b"/><rect x="18" y="19" width="84" height="8" rx="4" fill="#0e7490"><animate attributeName="width" values="0;84;84" dur="3s" repeatCount="indefinite"/></rect><circle cx="14" cy="23" r="4" fill="#94a3b8"/><circle cx="106" cy="23" r="4" fill="#94a3b8"/></svg>',
+ cells:'<svg viewBox="0 0 120 46" width="100%" height="46">'+[20,45,70,95].map((x,i)=>`<circle cx="${x}" cy="23" r="9" fill="#164e63" stroke="#22d3ee"><animate attributeName="r" values="8;10;8" dur="${1.6+i*.3}s" repeatCount="indefinite"/></circle>`).join('')+'</svg>',
+ dock:'<svg viewBox="0 0 120 46" width="100%" height="46"><rect x="10" y="26" width="100" height="12" rx="4" fill="#1e293b" stroke="#64748b"/><rect x="30" y="6" width="60" height="18" rx="5" fill="#0e7490" stroke="#22d3ee"><animate attributeName="y" values="2;10;10" dur="2.4s" repeatCount="indefinite"/></rect><circle cx="22" cy="32" r="3" fill="#22d3ee"/><circle cx="60" cy="32" r="3" fill="#22d3ee"/><circle cx="98" cy="32" r="3" fill="#22d3ee"/></svg>',
+ wave:'<svg viewBox="0 0 120 46" width="100%" height="46"><polyline fill="none" stroke="#22d3ee" stroke-width="2" points="0,23 10,23 14,10 18,36 22,23 60,23 64,4 68,42 72,23 120,23"><animate attributeName="points" values="0,23 10,23 14,10 18,36 22,23 60,23 64,4 68,42 72,23 120,23;0,23 10,23 14,20 18,26 22,23 60,23 64,8 68,38 72,23 120,23;0,23 10,23 14,10 18,36 22,23 60,23 64,4 68,42 72,23 120,23" dur="1.2s" repeatCount="indefinite"/></polyline></svg>',
+ cam:'<svg viewBox="0 0 120 46" width="100%" height="46"><rect x="30" y="10" width="60" height="28" rx="6" fill="#1e293b" stroke="#94a3b8"/><circle cx="60" cy="24" r="9" fill="#0b1020" stroke="#94a3b8"/><circle cx="60" cy="24" r="4" fill="#f8fafc"><animate attributeName="opacity" values="1;1;0;1" keyTimes="0;.85;.9;1" dur="2s" repeatCount="indefinite"/></circle></svg>',
+ graph:'<svg viewBox="0 0 120 46" width="100%" height="46"><line x1="15" y1="23" x2="55" y2="23" stroke="#22d3ee" stroke-width="2"/><line x1="55" y1="23" x2="95" y2="10" stroke="#22c55e" stroke-width="2"/><line x1="55" y1="23" x2="95" y2="36" stroke="#22c55e" stroke-width="2"/><circle cx="15" cy="23" r="6" fill="#0e7490"/><circle cx="55" cy="23" r="6" fill="#0e7490"/><circle cx="95" cy="10" r="6" fill="#166534"/><circle cx="95" cy="36" r="6" fill="#166534"/><circle r="4" fill="#f8fafc"><animateMotion dur="2s" repeatCount="indefinite" path="M15,23 L55,23 L95,10"/></circle></svg>',
+ cert:'<svg viewBox="0 0 120 46" width="100%" height="46"><rect x="12" y="8" width="28" height="30" rx="5" fill="#07200f" stroke="#22c55e"/><text x="26" y="28" font-size="10" fill="#22c55e" text-anchor="middle" font-weight="700">PASS</text><rect x="46" y="8" width="28" height="30" rx="5" fill="#2a1f06" stroke="#f59e0b"/><text x="60" y="28" font-size="10" fill="#f59e0b" text-anchor="middle" font-weight="700">FLAG</text><rect x="80" y="8" width="28" height="30" rx="5" fill="#3a0d0d" stroke="#ef4444"/><text x="94" y="28" font-size="10" fill="#ef4444" text-anchor="middle" font-weight="700">STOP</text></svg>',
+ loop:'<svg viewBox="0 0 120 46" width="100%" height="46"><path d="M30,23 a30,16 0 1,1 60,0" fill="none" stroke="#14b8a6" stroke-width="3"/><polygon points="90,23 84,15 97,16" fill="#14b8a6"/><circle r="4" fill="#f8fafc"><animateMotion dur="2s" repeatCount="indefinite" path="M30,23 a30,16 0 1,1 60,0"/></circle></svg>'};
+const flowEl=document.getElementById('flow');
+STEPS.forEach((s,i)=>{const d=document.createElement('div');d.className='step '+(s.who==='o'?'ours':'eco');d.innerHTML=`<div class="n">STAGE ${s.n}</div><div class="t">${s.t}</div><span class="who ${s.who}">${s.who==='o'?'AuraCell 4D':'ecosystem'}</span><div class="icon">${ICONS[s.icon]}</div>`;d.onclick=()=>setStep(i);flowEl.appendChild(d);});
+let stepI=0,flowAuto=true;
+function setStep(i){stepI=i;const s=STEPS[i];document.querySelectorAll('.step').forEach((e,k)=>e.classList.toggle('active',k===i));document.getElementById('flowBar').style.width=((i+1)/STEPS.length*100)+'%';document.getElementById('fTitle').textContent=s.title;document.getElementById('fText').textContent=s.text;document.getElementById('fOut').textContent=s.out;}
+setStep(0);setInterval(()=>{if(page===1&&flowAuto)setStep((stepI+1)%STEPS.length);},4200);
+
+// ---------------------------------------------------------------- page 2 monitor
+let S=null;
+async function loadScenario(){try{const r=await fetch('scenario.json');if(r.ok){S=await r.json();return;}}catch(e){}const t=document.getElementById('scenarioInline').textContent;S=JSON.parse(t);}
+const $=id=>document.getElementById(id);
+let tNow=0,playing=false,lastTs=0,fired=new Set(),bursts=[],state='CONTINUE',dpx=1.0,q=10,tau=1.0,frame=0,tracks={},logLines=[],acHist=[],dpHist=[],tauHist=[],burstNow=0,activeRule=null,ruleUntil=0;
+const CELLPOS={};
+function tauOf(qv){const m=S.meta.cartridge;const Q=qv*1e-9/60,w=m.width_um*1e-6,h=m.height_um*1e-6;return 6*m.viscosity_pa_s*Q/(w*h*h)*10;}
+function reset(){tNow=0;fired=new Set();bursts=[];state='CONTINUE';dpx=1;q=S.meta.flow_ul_min;tau=tauOf(q);frame=0;tracks={};logLines=[];acHist=[];dpHist=[];tauHist=[];burstNow=0;activeRule=null;S.cells.forEach(c=>{tracks[c.id]={status:'alive',since:0,reason:'—'};CELLPOS[c.id]={x:c.x,y:c.y};});$('log').innerHTML='';render();}
+function log(cls,msg){const m=Math.floor(tNow);logLines.unshift(`<div class="${cls}">[${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}] ${msg}</div>`);logLines=logLines.slice(0,14);$('log').innerHTML=logLines.join('');}
+function setRule(r,stop){activeRule=r;ruleUntil=tNow+6;document.querySelectorAll('#rules div').forEach(d=>{d.classList.toggle('hot',d.dataset.r===r);d.classList.toggle('stop',!!stop&&d.dataset.r===r);});}
+function pulse(id){const e=$(id);e.classList.remove('pulse');void e.offsetWidth;e.classList.add('pulse');}
+function fire(ev,i){
+  switch(ev.type){
+    case 'info':log('in',ev.msg);break;
+    case 'frame':frame=ev.frame;log('in',`z-stack frame ${frame} acquired (periodic, 9.5 min cadence)`);break;
+    case 'burst':burstNow=ev.sigma;bursts.push(tNow);log('fl',ev.msg);setRule('burst');pulse('kAc');break;
+    case 'flag':state=state==='STOP'?'STOP':'FLAG';log('fl',ev.msg);if(ev.rule)setRule(ev.rule);pulse('kState');break;
+    case 'snapshot':log('in',ev.msg);break;
+    case 'vanish':ev.cells.forEach(c=>{if(tracks[c]){tracks[c].status='ended';tracks[c].since=frame;tracks[c].reason='ended within ±1 frame of T';}});log('fl',ev.msg);setRule('vanish');break;
+    case 'artefact':ev.cells.forEach(c=>{tracks[c].status='artefact';tracks[c].reason='mechanical-artefact candidate (burst at T) — excluded';});log('ar',ev.msg);pulse('kCount');break;
+    case 'clog':dpx=ev.dp_x;log(ev.dp_x>=1.5?'fl':'in',ev.msg);break;
+    case 'stop':state='STOP';log('st',ev.msg);setRule('dp_stop',true);pulse('kState');break;
+    case 'operator':q=ev.flow_ul_min;tau=tauOf(q);log('ok',ev.msg);break;
+    case 'resume':state='CONTINUE';log('ok',ev.msg);activeRule=null;document.querySelectorAll('#rules div').forEach(d=>d.classList.remove('hot','stop'));break;
+    case 'divide':tracks[ev.parent].status='divided';tracks[ev.parent].since=frame;tracks[ev.parent].reason=`→ ${ev.daughters.join(', ')} · penalty ${ev.penalty.toFixed(2)}`;const p=CELLPOS[ev.parent];ev.daughters.forEach((d,k)=>{tracks[d]={status:ev.penalty>0?'review':'alive',since:frame,reason:ev.penalty>0?`division flagged for review (penalty ${ev.penalty})`:'daughter, PASS'};CELLPOS[d]={x:p.x+(k?0.05:-0.05),y:p.y+(k?0.08:-0.08)};});log(ev.penalty>0?'fl':'ok',ev.msg);if(ev.penalty>0)setRule('gate');break;
+    case 'death':ev.cells.forEach(c=>{tracks[c].status='dead';tracks[c].since=frame;tracks[c].reason='no mechanical event within ±1 frame → drug-associated';});log('in',ev.msg);pulse('kCount');break;
+    case 'export':log('ok',ev.msg);break;
+    case 'loop':log('in',ev.msg);break;
+  }
+}
+function step(dt){tNow=Math.min(S.meta.duration_s,tNow+dt);S.events.forEach((ev,i)=>{if(!fired.has(i)&&ev.t<=tNow){fired.add(i);fire(ev,i);}});burstNow*=Math.pow(0.2,dt);if(tNow>=S.meta.duration_s)playing=false;}
+function render(){
+  const counts={alive:0,div:0,art:0,dead:0};Object.values(tracks).forEach(t=>{if(t.status==='alive'||t.status==='review')counts.alive++;if(t.status==='divided')counts.div++;if(t.status==='artefact')counts.art++;if(t.status==='dead')counts.dead++;});
+  $('kState').textContent=state;$('kState').className='v state-'+state;$('kStateS').textContent=state==='CONTINUE'?'all rules in green band':state==='FLAG'?'logged + snapshot + operator notice':'recommendation to operator — pump not controlled';
+  $('kQ').textContent=q.toFixed(1);$('kTau').textContent=tau.toFixed(2);$('kTau').style.color=tau>30?'var(--red)':tau>15?'var(--amber)':'';
+  $('kDp').textContent=dpx.toFixed(2)+'×';$('kDp').style.color=dpx>=2.5?'var(--red)':dpx>=1.5?'var(--amber)':'';$('kDpS').textContent=`${Math.round(S.meta.dp_baseline_pa*dpx)} Pa · flag ≥1.5× · stop ≥2.5×`;
+  const sig=(0.6+Math.random()*0.6+burstNow);$('kAc').textContent=sig.toFixed(1)+' σ';$('kAc').style.color=sig>3.5?'var(--amber)':'';const b10=bursts.filter(b=>tNow-b<=10).length;$('kAcS').textContent=`event at >3.5 σ · bursts/10 min: ${b10}`;
+  $('kFrame').textContent='t '+String(frame).padStart(3,'0');$('frameTag').textContent='frame '+frame;$('kCount').textContent=`${counts.alive} / ${counts.div} / ${counts.art} / ${counts.dead}`;
+  const m=Math.floor(tNow);$('clock').textContent=`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;$('tl').textContent=`${tNow.toFixed(0)} / ${S.meta.duration_s} min`;$('scrub').value=tNow;$('play').textContent=playing?'❚❚ pause':'▶ play';
+  $('acTag').textContent=burstNow>1?`BURST ${(burstNow).toFixed(1)} σ`:'baseline';
+  if(tNow-ruleUntil>0&&activeRule&&state==='CONTINUE'){activeRule=null;document.querySelectorAll('#rules div').forEach(d=>d.classList.remove('hot','stop'));}
+  // tracks table
+  const order={review:0,artefact:1,dead:2,divided:3,alive:4,ended:5};
+  $('tbody').innerHTML=Object.entries(tracks).sort((a,b)=>order[a[1].status]-order[b[1].status]||a[0]-b[0]).slice(0,5).map(([id,t])=>{const pc={alive:'p-alive',review:'p-rev',artefact:'p-art',dead:'p-dead',divided:'p-div',ended:'p-art'}[t.status];const lb={alive:'ALIVE',review:'REVIEW',artefact:'ARTEFACT-EXCL',dead:'DRUG-DEATH',divided:'DIVIDED',ended:'ENDED'}[t.status];return `<tr><td>#${id}</td><td><span class="pill ${pc}">${lb}</span></td><td>f${t.since}</td><td>${t.reason}</td></tr>`;}).join('');
+  drawAc();drawBand();drawDp();drawCells();
+}
+function fit(c){const r=c.getBoundingClientRect();if(c.width!==Math.round(r.width*devicePixelRatio)){c.width=Math.round(r.width*devicePixelRatio);c.height=Math.round(c.getAttribute('height')*devicePixelRatio);}const g=c.getContext('2d');g.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);return [g,r.width,+c.getAttribute('height')];}
+function drawAc(){const c=$('cAc');const [g,W,H]=fit(c);g.clearRect(0,0,W,H);g.strokeStyle='#1b2540';for(let x=0;x<W;x+=40){g.beginPath();g.moveTo(x,0);g.lineTo(x,H);g.stroke();}g.strokeStyle='#22d3ee';g.lineWidth=1.3;g.beginPath();const ph=performance.now()/1000;for(let x=0;x<W;x++){const u=x/W;let y=Math.sin(u*60+ph*8)*4+Math.sin(u*150+ph*12)*2+(Math.random()-.5)*3;if(burstNow>1){const env=Math.exp(-Math.pow((u-0.62)*9,2));y+=Math.sin(u*900+ph*40)*burstNow*7*env;}g.lineTo(x,H/2+y);}g.stroke();g.fillStyle='#8ea0bd';g.font='10px ui-monospace';g.fillText('250 kS/s · 20 ms windows · envelope vs rolling baseline',6,12);}
+function drawBand(){const c=$('cBand');const [g,W,H]=fit(c);g.clearRect(0,0,W,H);const n=36;for(let i=0;i<n;i++){const f=60+i*(140/n);let v=0.12+Math.random()*0.08;if(burstNow>1){const cf=S.events.filter(e=>e.type==='burst'&&fired.has(S.events.indexOf(e))).slice(-1)[0];const ck=cf?cf.khz:110;v+=Math.exp(-Math.pow((f-ck)/9,2))*Math.min(1,burstNow/6);}const x=i*(W/n),h=v*(H-18);g.fillStyle=(f>=80&&f<=180)?(v>0.4?'#f59e0b':'#0e7490'):'#1f2a44';g.fillRect(x+1,H-16-h,W/n-2,h);}g.fillStyle='#8ea0bd';g.font='10px ui-monospace';[60,80,109.6,142,164,180,200].forEach(f=>{const x=(f-60)/140*W;g.fillText(f,x-6,H-4);});g.strokeStyle='#f59e0b55';g.setLineDash([3,3]);g.strokeRect((80-60)/140*W,2,(100)/140*W,H-18);g.setLineDash([]);}
+function drawDp(){const c=$('cDp');const [g,W,H]=fit(c);g.clearRect(0,0,W,H);dpHist.push(dpx);tauHist.push(tau);if(dpHist.length>240){dpHist.shift();tauHist.shift();}const yOf=v=>H-10-(v/3.2)*(H-24);g.strokeStyle='#3a0d0d';g.setLineDash([4,4]);g.beginPath();g.moveTo(0,yOf(2.5));g.lineTo(W,yOf(2.5));g.stroke();g.strokeStyle='#2a1f06';g.beginPath();g.moveTo(0,yOf(1.5));g.lineTo(W,yOf(1.5));g.stroke();g.setLineDash([]);g.fillStyle='#ef4444';g.font='10px ui-monospace';g.fillText('STOP 2.5×',W-62,yOf(2.5)-3);g.fillStyle='#f59e0b';g.fillText('FLAG 1.5×',W-62,yOf(1.5)-3);
+ g.strokeStyle='#a78bfa';g.lineWidth=2;g.beginPath();dpHist.forEach((v,i)=>{const x=i/240*W;i?g.lineTo(x,yOf(v)):g.moveTo(x,yOf(v));});g.stroke();g.strokeStyle='#22d3ee';g.lineWidth=1.5;g.beginPath();tauHist.forEach((v,i)=>{const x=i/240*W;const y=H-10-(v/2)*(H-24)*0.5;i?g.lineTo(x,y):g.moveTo(x,y);});g.stroke();g.fillStyle='#a78bfa';g.fillText('ΔP ×baseline',6,12);g.fillStyle='#22d3ee';g.fillText('τ dyn/cm² (scaled)',90,12);}
+function drawCells(){const c=$('cCells');const [g,W,H]=fit(c);g.clearRect(0,0,W,H);g.fillStyle='#0a0f1f';g.fillRect(0,0,W,H);for(let i=1;i<6;i++){g.fillStyle='#16203a';g.fillRect(i*W/6,0,1,H);}Object.entries(tracks).forEach(([id,t])=>{const p=CELLPOS[id];if(!p)return;const col={alive:'#22d3ee',review:'#a78bfa',artefact:'#f59e0b',dead:'#ef4444',divided:'#334155',ended:'#f59e0b'}[t.status];const x=p.x*W,y=p.y*H;g.beginPath();g.arc(x,y,t.status==='divided'?5:9,0,Math.PI*2);g.strokeStyle=col;g.lineWidth=t.status==='alive'?1.5:2.5;g.fillStyle=t.status==='alive'?'#0e4a5a':t.status==='divided'?'#111827':col+'33';g.fill();g.stroke();if(t.status==='artefact'||t.status==='dead'){g.beginPath();g.moveTo(x-6,y-6);g.lineTo(x+6,y+6);g.moveTo(x+6,y-6);g.lineTo(x-6,y+6);g.stroke();}g.fillStyle='#cbd5e1';g.font='9px ui-monospace';g.fillText('#'+id,x+10,y-6);});g.fillStyle='#8ea0bd';g.font='10px ui-monospace';g.fillText('× artefact-candidate (excluded) · × red: drug-associated · purple: division for review',6,H-5);}
+function togglePlay(){playing=!playing;lastTs=performance.now();if(playing&&tNow>=S.meta.duration_s){reset();playing=true;}}
+$('play').onclick=togglePlay;$('scrub').oninput=e=>{const target=+e.target.value;reset();while(tNow<target){step(0.5);}render();};
+// wall-clock driven stepping (independent of requestAnimationFrame throttling)
+setInterval(()=>{if(S&&playing&&page===2){const now=performance.now();const dt=Math.min(1.0,(now-lastTs)/1000)* +$('speed').value;lastTs=now;step(dt);}},100);
+function loop(){if(S&&page===2)render();requestAnimationFrame(loop);}
+function applyUrl(){const u=new URLSearchParams(location.search);const p=+u.get('page');if(p>=1&&p<=4)go(p);const t=parseFloat(u.get('t'));if(!isNaN(t)){reset();while(tNow<t){step(0.5);}render();}if(u.get('play')==='1'){playing=true;lastTs=performance.now();}if(u.get('step')){setStep(+u.get('step')-1);flowAuto=false;}}
+loadScenario().then(()=>{reset();applyUrl();requestAnimationFrame(loop);});
+
+// ---------------------------------------------------------------- page 3 results
+const RES=[{l:'greedy, no gate',v:[0.9276,0.9426],c:'#9aa4b2'},{l:'greedy + gate',v:[0.9587,0.9426],c:'#f59e0b'},{l:'ILP, no gate',v:[0.9970,0.9964],c:'#0f8b8d'},{l:'ILP + soft gate',v:[0.9976,0.9964],c:'#14b8a6'}];
+let resDone=false;
+function animateResults(){const b=$('bars');b.innerHTML='';RES.forEach(r=>{b.innerHTML+=`<div class="bar"><div>${r.l}</div><div class="fill"><i style="background:${r.c}"></i></div><div class="val" style="color:${r.c}">${r.v[0].toFixed(4)} / ${r.v[1].toFixed(4)}</div></div>`;});setTimeout(()=>{document.querySelectorAll('#bars .fill i').forEach((e,i)=>{const v=RES[i].v[0];e.style.width=((v-0.90)/0.10*100)+'%';});},80);
+ let a=0,b2=0;const T=setInterval(()=>{a=Math.min(178,a+6);b2=Math.min(5,b2+1);$('n178').textContent=a;$('n5').textContent=b2;if(a>=178)clearInterval(T);},40);}
+</script>
+</body>
+</html>

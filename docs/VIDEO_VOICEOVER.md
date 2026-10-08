@@ -37,6 +37,17 @@ The immediate beneficiary is the bench scientist who today scrolls through hundr
 
 ---
 
+## Demo pages built for the recording (`gui/demo/index.html`)
+
+Serve with `python gui/launch_gui.py` and open `http://127.0.0.1:8765/demo/index.html` (1600×900 recommended). Keys: ← → pages, space = play/pause, URL params `?page=2&t=55&play=1` jump to a moment.
+
+| Page | Use for segment | What it shows | Honesty label on screen |
+|---|---|---|---|
+| 1 Workflow | 0:00–1:10 | 8-stage animated stepper: fabrication → seeding → docking → perfusion + continuous listening → periodic imaging → **detect → ILP → gate** → certificates → researcher review → loop | DESIGN · animated explainer |
+| 2 Live monitor | 1:45–2:40 | Scripted 130-min scenario from `scenario.json`: 109.6 kHz burst → FLAG → 2 tracks vanish → artefact candidates excluded; ΔP 1.7× FLAG → 2.6× STOP → operator lowers flow; division with gate penalty → review; drug-associated death; audit export | SIMULATION · no hardware |
+| 3 Measured results | 2:40–3:25 | Animated TRA bars and 178 → 5 counter from `results/ablation.json` | [MEASURED] |
+| 4 Measured vs Design | 3:25–3:55 | Two-column closing slide | closing |
+
 ## Shot list (for recording)
 | Time | Screen | Source |
 |---|---|---|
