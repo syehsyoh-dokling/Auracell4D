@@ -31,7 +31,9 @@
     {"t": 14,  "type": "snapshot","msg": "Event-triggered snapshot acquired (T + 2 min)"},
     {"t": 14,  "type": "vanish",  "cells": [3, 10], "msg": "Tracker: tracks 3 and 10 end within ±1 frame of T without a division"},
     {"t": 14,  "type": "artefact","cells": [3, 10], "msg": "→ marked MECHANICAL-ARTEFACT CANDIDATES; excluded from drug-death count (reason attached)"},
+    {"t": 14,  "type": "counter", "msg": "COUNTERFACTUAL: a tracker without the acoustic channel would count tracks 3 and 10 as drug deaths (naive count 2 vs AuraCell 0)"},
     {"t": 19,  "type": "frame",   "frame": 2},
+    {"t": 24,  "type": "noise",   "khz": 62.0, "sigma": 4.4, "msg": "Transient at 62 kHz (4.4 σ) — pump harmonic, OUTSIDE the 80–180 kHz Minnaert band → logged, no flag, no exclusion"},
     {"t": 28.5,"type": "frame",   "frame": 3},
     {"t": 30,  "type": "clog",    "dp_x": 1.2, "msg": "ΔP rising: 1.2× baseline (watch)"},
     {"t": 38,  "type": "frame",   "frame": 4},
@@ -52,12 +54,13 @@
     {"t": 88,  "type": "flag",    "rule": "gate", "msg": "FLAG: division shown to researcher with both daughter volumes"},
     {"t": 95,  "type": "frame",   "frame": 10},
     {"t": 98,  "type": "death",   "cells": [7], "msg": "Track 7 ends; no acoustic/pressure event within ±1 frame → counted as drug-associated death"},
+    {"t": 98,  "type": "counter", "msg": "COUNTERFACTUAL: naive drug-death count would now read 3; AuraCell reads 1 (+2 excluded with reasons attached)"},
     {"t": 104.5,"type": "frame",  "frame": 11},
     {"t": 110, "type": "burst",   "khz": 142.0, "sigma": 4.1, "radius_um": 23, "msg": "Acoustic burst 142 kHz (4.1 σ) ≈ 23 µm bubble"},
     {"t": 110, "type": "flag",    "rule": "burst", "msg": "FLAG: 2nd burst in 10 min (notice at ≥ 3); snapshot requested"},
     {"t": 114, "type": "frame",   "frame": 12},
     {"t": 114, "type": "info",    "msg": "No track ended near this event → nothing excluded"},
-    {"t": 122, "type": "export",  "msg": "Audit export: 10 tracks, 2 divisions (1 PASS, 1 FLAG), 2 artefact candidates excluded, 1 drug-associated death, 4 FLAG + 1 STOP recommendation"},
+    {"t": 122, "type": "export",  "msg": "Audit export: 10 tracks, 2 divisions (1 PASS, 1 FLAG), 2 artefact candidates excluded, 1 drug-associated death (naive count would be 3), 1 out-of-band transient ignored, 4 FLAG + 1 STOP recommendation"},
     {"t": 128, "type": "loop",    "msg": "Researcher review → next dose → loop back to perfusion"}
   ]
 }
