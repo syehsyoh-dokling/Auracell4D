@@ -3,7 +3,7 @@
 
 **AI4S Open Innovation: AI for Life Science — The 5th Pazhou Algorithm Competition**
 **Category declared:** Model & Algorithm · **Team:** Saifuddin (AI & systems; no biology member — cross-disciplinary bonus not claimed)
-**Repository:** https://github.com/syehsyoh-dokling/Auracell4D · **Entry script:** `evaluate.py` · **Demo video:** *[public link inserted at submission]*
+**Repository:** https://github.com/syehsyoh-dokling/Auracell4D · **Entry script:** `evaluate.py` · **Demo video:** https://youtu.be/5ts7kyqQb_k
 **Figures:** `docs/figures/` (300 dpi; regenerate with `python make_figures.py`) · **Abstract:** `docs/ABSTRACT.md` · **Claim audit:** `docs/AUDIT_LOG.md`
 
 > **Labelling convention.** Every quantitative statement is tagged **[Measured]** (produced by `evaluate.py` on public data, `results/ablation.json`) or **[Design]** (physics-based design parameter or simulation; no performance claimed). An earlier draft of this project contained figures that could not be reproduced; they were audited claim by claim (`docs/AUDIT_LOG.md`) and removed.

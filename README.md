@@ -7,6 +7,8 @@ Submission category: *see writeup.md (declared at top)*
 > **[Measured]** — produced by `evaluate.py` on public Cell Tracking Challenge data, reproducible without login;
 > **[Simulated/Concept]** — physics-based simulation or design concept; no performance claim is made.
 
+**Demo video (≤5 min):** https://youtu.be/5ts7kyqQb_k · **Kaggle writeup:** `writeup.md` · **Technical report:** `docs/TECHNICAL_REPORT.md`
+
 ## What this repository actually contains
 
 | Component | Status | Where |

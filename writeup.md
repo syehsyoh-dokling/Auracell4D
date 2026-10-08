@@ -7,7 +7,7 @@
 * **Category Declaration:** **Model & Algorithm** — a physics-gated network-flow ILP for 3D+t cell lineage tracking, with an ablation on public Cell Tracking Challenge data. (Sensor fusion and chip actuation are presented as *design concept and roadmap*, not as results.)
 * **Team:** Saifuddin — AI & systems (computer vision, signal processing, optimisation). *No biology/bioengineering member is declared; we do not claim the cross-disciplinary bonus.*
 * **Code repository:** https://github.com/syehsyoh-dokling/Auracell4D — entry script `evaluate.py`, `README.md`, `requirements.txt`
-* **Demo video:** `[public link to be inserted at submission]`
+* **Demo video:** https://youtu.be/5ts7kyqQb_k
 * **Reproducibility:** `pip install -r requirements.txt && python evaluate.py` downloads the public dataset and regenerates every **[Measured]** number in this document in ≈15–30 min on CPU, without login.
 
 > **Labelling convention used throughout.** Every quantitative statement carries one of two tags:
