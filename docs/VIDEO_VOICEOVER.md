@@ -1,70 +1,35 @@
-# AuraCell 4D — Demo Video Voice-Over (English, ≈3:55, ≈560 words at 145 wpm)
+# AuraCell 4D — Product Introduction Voice-Over (English, ≈480 words, ≈3:20–3:40)
 
-> Positive, value-first narration for the demo video. Limitations and failure analysis are documented in `docs/TECHNICAL_REPORT.md` §8 and `docs/AUDIT_LOG.md` and are covered in the Q&A, not in the video.
-> Two short factual anchors stay in the script because the claims depend on them: the live monitor is a *scripted scenario*, and the TRA figures are measured *with reference detections*.
-> Screen cues in *italics*; URL parameters jump the demo pages (`gui/demo/index.html`, 1600×900) to the exact moment.
-
----
-
-**[0:00–0:25] THE OPPORTUNITY**
-*Screen: `?page=1&step=6`, then Fig. 5 (real frame; greedy fork vs clean ILP lineage).*
-
-Organ-on-a-chip experiments produce thousands of 3-D frames of living cells. To know whether a drug works, every cell's lineage must be reconstructed: who moved, who divided, who died. Conventional trackers decide frame by frame — and whenever two nuclei touch, they invent a division: on one public sequence with four real divisions, a greedy tracker proposed one hundred seventy-eight. AuraCell 4D was built to make that lineage trustworthy — and auditable.
-
-**[0:25–0:55] WHERE THE TOOL WORKS**
-*Screen: `?page=1`, auto-advancing stages 1→8.*
-
-Here is the full flow. The lab fabricates the cartridge and seeds the cells. AuraCell 4D takes over at docking: geometry and flow rate are recorded, and the physical baseline is computed — one point zero dyne per square centimetre of wall shear for a thousand-by-hundred-micron channel. From the first second of perfusion, the acoustic channel listens continuously, while the microscope keeps its periodic cadence every nine and a half minutes. Then the algorithm runs: detection, global linking, biological gate. Every event receives a certificate — continue, flag, or stop — the researcher stays in command, and the loop restarts at the next dose.
-
-**[0:55–1:20] THE ALGORITHM**
-*Screen: `?page=1&step=6`, link / divide / appear / disappear diagram.*
-
-For each pair of frames we solve one integer linear program: every nucleus takes exactly one fate — link, divide, or disappear — and every nucleus in the next frame has exactly one origin. Biology enters as a cost, not a ban: a division with implausible daughter volumes becomes expensive, so the optimiser avoids it unless the evidence is strong. And that cost is calibrated from the data itself.
-
-**[1:20–2:15] THE KEY INCIDENT — DRUG OR BUBBLE?**
-*Screen: `?page=2&t=10&play=1`, 2× speed, run to minute ≈28.*
-
-Now the live monitor, running a scripted scenario. Minute twelve: the acoustic channel catches a burst at one hundred nine point six kilohertz — the Minnaert frequency of a thirty-micron bubble. The system stamps the time T and requests one extra snapshot. Next frame: tracks three and ten are gone. AuraCell 4D recognises them as mechanical-artefact candidates and keeps them out of the drug-death count — with the reason written down. Watch the counter: a naive count says two; AuraCell says zero.
-*Screen: minute 24.*
-Minute twenty-four: another transient, sixty-two kilohertz. Outside the bubble band — a pump harmonic. Logged, ignored, nothing excluded. The system reacts to evidence, not to noise.
-*Screen: cut to `?page=2&t=96&play=1`, stop at minute ≈102.*
-Minute ninety-eight: track seven ends with no mechanical event nearby. This one is a genuine drug-associated death, and it counts. Naive count: three. AuraCell: one — with both exclusions explained in the audit trail. That is the number a researcher can defend.
-
-**[2:15–2:27] SAFETY — OPERATOR IN COMMAND**
-*Screen: `?page=2&t=55`, 3–4 s.*
-
-In between, pressure climbed to two point six times baseline. The system flagged it early, recommended a stop, and the operator lowered the flow. The decision stays human; the evidence comes from the tool.
-
-**[2:27–3:10] RESULTS**
-*Screen: `?page=3`, animated bars and the 178 → 5 counter.*
-
-Measured with the official Cell Tracking Challenge metrics on public data, with reference detections: the ILP raises the TRA score from point nine two eight to point nine nine eight on sequence one, and from point nine four three to point nine nine six on sequence two. False divisions drop from one hundred seventy-eight to five. The whole evaluation reproduces identically on Colab and on a local laptop with a single command — and the GUI runs it from one button, then exports the audit trail.
-
-**[3:10–3:50] WHO BENEFITS & CLOSE**
-*Screen: `?page=4`.*
-
-The first beneficiary is the bench scientist, who now reviews a handful of flagged events instead of the whole movie. Downstream, the same audit trail is exactly what regulators ask for as organ-on-a-chip data replaces animal testing. Every number in our report carries a label — measured or design — so reviewers always know which is which. Next on the roadmap: a learned 3-D segmenter, a real chip recording with a synchronised acoustic channel, then hardware. AuraCell 4D: trustworthy lineages, every number labelled, every decision explainable.
+> Professional product-introduction tone. No timestamps, no on-screen instructions, no research-report language in the narration. Limitations are documented in `docs/TECHNICAL_REPORT.md` §8 and `docs/AUDIT_LOG.md` and are addressed in Q&A.
+> Two factual anchors remain in natural wording: the monitoring sequence is a *demonstration scenario*, and the benchmark figures were obtained *with reference detections*.
 
 ---
 
-## Demo pages used (`gui/demo/index.html`)
+## Narration
 
-| Page | Segment | Shows |
+**From dishes to chips.** For decades, drugs were tested in two-dimensional dishes and in animals — and nine out of ten candidates that passed there still failed in humans. Organ-on-a-chip changed that: living human cells in micro-channels perfused like blood vessels, now accepted by regulators as an alternative to animal testing. But the chip created a new challenge. It produces thousands of three-dimensional frames that must be interpreted — which cell moved, which divided, which died. Conventional trackers decide frame by frame, and whenever two nuclei touch they invent a division: on a public benchmark with four real divisions, a standard tracker proposed one hundred seventy-eight. AuraCell 4D was built to make that lineage trustworthy — and auditable.
+
+**Where it works.** The laboratory fabricates the cartridge and seeds the cells. AuraCell 4D takes over at docking: geometry and flow rate are recorded, and the physical baseline is computed from them. From the first second of perfusion the acoustic channel listens continuously, while the microscope keeps its periodic cadence. Then the algorithm runs — detection, global linking, biological gate. Every event receives a certificate: continue, flag, or stop. The researcher stays in command, and the cycle repeats at the next dose.
+
+**The algorithm.** For each pair of frames, AuraCell 4D solves one integer linear program: every nucleus takes exactly one fate — link, divide, or disappear — and every nucleus in the next frame has exactly one origin. Biology enters as a cost, not a ban: a division with implausible daughter volumes becomes expensive, so the optimiser avoids it unless the evidence is strong. That cost is calibrated from the data itself.
+
+**Drug or bubble?** In this demonstration scenario, the acoustic channel catches a burst at the resonance frequency of a thirty-micron bubble. The system stamps the moment and requests an extra snapshot. Two cells disappear at the next frame. A plain tracker would count two drug deaths. AuraCell 4D recognises them as mechanical-artefact candidates and keeps them out of the drug-death count — with the reason written down. A pump harmonic outside the bubble band is logged and ignored: the system reacts to evidence, not to noise. Later, a cell ends with no mechanical event nearby — a genuine drug-associated death, and it counts. The result is a number a researcher can defend, with every exclusion explained in the audit trail. When pressure climbs, the system flags it early and recommends a stop; the operator decides. Human in command, evidence from the tool.
+
+**Proven on public data.** Measured with the official Cell Tracking Challenge metrics, with reference detections, AuraCell 4D raises the tracking score from point nine three to point nine nine eight, and cuts false divisions from one hundred seventy-eight to five. The entire evaluation reproduces identically on Colab and on a laptop with a single command — and the interface runs it from one button, then exports the audit trail.
+
+**Who benefits.** The bench scientist reviews a handful of flagged events instead of the whole movie. Regulators receive exactly the traceability they ask for as organ-on-a-chip data replaces animal testing. And every figure in our documentation carries a label — measured or design — so reviewers always know which is which. Next on the roadmap: a learned 3-D segmenter, real chip recordings with a synchronised acoustic channel, then hardware.
+
+AuraCell 4D: trustworthy lineages, every number labelled, every decision explainable.
+
+---
+
+## Editor's screen map (not spoken)
+
+| Narration block | Visual | Source |
 |---|---|---|
-| 1 Workflow | 0:00–1:20 | 8-stage animated stepper, lab vs AuraCell 4D, loop |
-| 2 Live monitor | 1:20–2:27 | scripted 130-min scenario; counterfactual counter "naive vs AuraCell" |
-| 3 Measured results | 2:27–3:10 | animated TRA bars, 178 → 5 counter |
-| 4 Measured vs Design | 3:10–3:50 | closing two-column slide |
-
-## Shot list
-
-| Time | Screen | URL / source |
-|---|---|---|
-| 0:00 | Stage 6 + Fig. 5 | `?page=1&step=6`; `docs/figures/fig5_frame_overlay.png` |
-| 0:25 | Workflow auto-advance | `?page=1` |
-| 0:55 | Stage 6 + ILP diagram | `?page=1&step=6`; slide from writeup §4.2 |
-| 1:20 | Key incident, part 1 | `?page=2&t=10&play=1` (2×, ≈9 s real time) |
-| 1:55 | Key incident, part 2 | `?page=2&t=96&play=1` (≈3 s), zoom on "naive vs AuraCell" |
-| 2:15 | Pressure flag → operator | `?page=2&t=55` (static, 3–4 s) |
-| 2:27 | Measured results | `?page=3` |
-| 3:10 | Close | `?page=4` |
+| From dishes to chips | dish → chip transition; Fig. 5 (false fork vs clean lineage) | `docs/figures/fig5_frame_overlay.png` |
+| Where it works | workflow stepper auto-advancing | `gui/demo/index.html?page=1` |
+| The algorithm | stage 6 + ILP diagram | `?page=1&step=6` |
+| Drug or bubble? | live monitor playing from the burst through the counterfactual counter; brief pressure flag | `?page=2&t=10&play=1`, cut to `?page=2&t=96&play=1`, `?page=2&t=55` |
+| Proven on public data | animated TRA bars and 178 → 5 counter; GUI Step 4 | `?page=3`, `docs/figures/gui_step4.png` |
+| Who benefits | closing slide | `?page=4` |
