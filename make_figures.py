@@ -54,7 +54,7 @@ for ax, seq in zip(axes, ["01", "02"]):
     pred = [get(seq, "gt", t)["mitosis_pred"] for t in trackers]
     gt_n = get(seq, "gt", "ilp_gate")["mitosis_gt"]
     bars = ax.bar(labels, [max(p, 0.5) for p in pred], color=colors)
-    ax.axhline(gt_n, ls=":", lw=1.2, color="k"); ax.text(3.45, gt_n * 1.15, f"true divisions in GT: {gt_n}", ha="right", fontsize=7.5)
+    ax.axhline(gt_n, ls=":", lw=1.2, color="k"); ax.text(-0.4, gt_n * 0.78, f"true divisions in GT: {gt_n}", ha="left", va="top", fontsize=7.5)
     for b, v in zip(bars, pred):
         ax.text(b.get_x() + b.get_width() / 2, max(v, 0.5) * 1.12, str(v), ha="center", va="bottom", fontsize=8)
     ax.set_yscale("log"); ax.set_ylim(0.4, 400)
