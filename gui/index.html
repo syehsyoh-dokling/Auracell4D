@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuraCell 4D - Bio-Workstation & Cancer Drug Testing Lab Station</title>
+  <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+  <style>
+    /* Custom clean scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--card, #1e293b); }
+    ::-webkit-scrollbar-thumb { background: var(--border, #475569); border-radius: 3px; }
+    .pulse-glow { animation: pulseGlow 2s infinite; }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+      50% { box-shadow: 0 0 25px rgba(56, 189, 248, 0.8); }
+    }
+  </style>
+</head>
+<body class="bg-[var(--background,#0f172a)] text-[var(--foreground,#f8fafc)] font-sans antialiased p-4 md:p-8 min-h-screen">
+
+  <!-- TOP HEADER / NAV -->
+  <header class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-[var(--border,#334155)] gap-4">
+    <div class="flex items-center space-x-4">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-lg">
+        A4D
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <h1 class="text-2xl font-bold tracking-tight text-[var(--foreground,#f8fafc)]">AuraCell 4D</h1>
+          <span class="px-2 py-0.5 text-xs font-semibold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full">Station Ready</span>
+          <span class="px-2 py-0.5 text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 rounded-full">Reference cartridge 1000×100 µm (design)</span>
+        </div>
+        <p class="text-sm text-[var(--muted-foreground,#94a3b8)]">Physics-gated lineage tracking for organ-on-a-chip time-lapse — measured results (Step 4) + design simulations (Steps 2–3)</p>
+      </div>
+    </div>
+
+    <!-- Quick Status Indicators -->
+    <div class="flex items-center space-x-6 text-sm">
+      <div class="flex flex-col">
+        <span class="text-xs text-[var(--muted-foreground,#94a3b8)]">Cartridge Status</span>
+        <span id="headerCartridgeStatus" class="font-semibold text-emerald-400 flex items-center">
+          <span class="w-2 h-2 rounded-full bg-amber-400 mr-2 animate-ping"></span> Demo cartridge (simulated)
+        </span>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-xs text-[var(--muted-foreground,#94a3b8)]">Acoustic Shield</span>
+        <span id="headerAcousticStatus" class="font-semibold text-cyan-400">SIMULATED</span>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-xs text-[var(--muted-foreground,#94a3b8)]">Regulatory export</span>
+        <span class="font-semibold text-purple-400">roadmap (not implemented)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- STEP-BY-STEP WORKFLOW GUIDE BAR (For Non-Programmer Scientists) -->
+  <div class="max-w-7xl mx-auto mb-8">
+    <div class="bg-[var(--card,#1e293b)] border border-[var(--border,#334155)] rounded-2xl p-4 shadow-sm">
+      <div class="flex flex-col md:flex-row items-center justify-between text-xs md:text-sm font-medium gap-2">
+        
+        <!-- Step 1 -->
+        <button onclick="goToStep(1)" id="stepTab1" class="flex-1 w-full py-2 px-3 rounded-xl flex items-center space-x-2 bg-cyan-600 text-white font-semibold transition-all">
+          <span class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">1</span>
+          <span>Sample & Cartridge Setup</span>
+        </button>
+
+        <span class="hidden md:inline text-[var(--muted-foreground,#64748b)]">➔</span>
+
+        <!-- Step 2 -->
+        <button onclick="goToStep(2)" id="stepTab2" class="flex-1 w-full py-2 px-3 rounded-xl flex items-center space-x-2 bg-[var(--card,#1e293b)] text-[var(--muted-foreground,#94a3b8)] hover:text-white transition-all">
+          <span class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs">2</span>
+          <span>Acoustic & Perfusion Shield</span>
+        </button>
+
+        <span class="hidden md:inline text-[var(--muted-foreground,#64748b)]">➔</span>
+
+        <!-- Step 3 -->
+        <button onclick="goToStep(3)" id="stepTab3" class="flex-1 w-full py-2 px-3 rounded-xl flex items-center space-x-2 bg-[var(--card,#1e293b)] text-[var(--muted-foreground,#94a3b8)] hover:text-white transition-all">
+          <span class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs">3</span>
+          <span>Redox Metabolic Screening</span>
+        </button>
+
+        <span class="hidden md:inline text-[var(--muted-foreground,#64748b)]">➔</span>
+
+        <!-- Step 4 -->
+        <button onclick="goToStep(4)" id="stepTab4" class="flex-1 w-full py-2 px-3 rounded-xl flex items-center space-x-2 bg-[var(--card,#1e293b)] text-[var(--muted-foreground,#94a3b8)] hover:text-white transition-all">
+          <span class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs">4</span>
+          <span>4D Cell Tracking & Mitosis</span>
+        </button>
+
+        <span class="hidden md:inline text-[var(--muted-foreground,#64748b)]">➔</span>
+
+        <!-- Step 5 -->
+        <button onclick="goToStep(5)" id="stepTab5" class="flex-1 w-full py-2 px-3 rounded-xl flex items-center space-x-2 bg-[var(--card,#1e293b)] text-[var(--muted-foreground,#94a3b8)] hover:text-white transition-all">
+          <span class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs">5</span>
+          <span>FDA/Dossier Report</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN INTERACTIVE CONTAINER -->
+  <main class="max-w-7xl mx-auto">
+
+    <!-- ================================================================= -->
+    <!-- STEP 1: SAMPLE & CARTRIDGE SETUP (The Very First Visible Screen) -->
+    <!-- ================================================================= -->
+    <section id="stepSection1" class="space-y-6">
+      <div class="bg-[var(--card,#1e293b)] border border-[var(--border,#334155)] rounded-2xl p-6 shadow-md">
+        <div class="border-b border-[var(--border,#334155)] pb-4 mb-6">
+          <span class="text-xs uppercase tracking-wider font-bold text-cyan-400">Step 1 of 5 • Initial Setup</span>
+          <h2 class="text-2xl font-bold text-[var(--foreground,#f8fafc)] mt-1">Select Bio-Cartridge & Cancer Cell Culture</h2>
+          <p class="text-sm text-[var(--muted-foreground,#94a3b8)]">Choose your microfluidic cartridge model, target oncology cell line, and oncology drug candidate.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Card 1: Cartridge Hardware -->
+          <div class="p-5 rounded-xl border border-[var(--border,#334155)] bg-slate-900/60 flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-semibold text-cyan-400 uppercase">Hardware Slot A</span>
+              <h3 class="text-lg font-bold mt-1">Reference cartridge (design)</h3>
+              <p class="text-xs text-[var(--muted-foreground,#94a3b8)] mt-2">ANSI-SLAS footprint, dual-channel 1000×100 µm, Sylgard 184 PDMS membrane (10 µm thick, 7 µm pores).</p>
+              
+              <div class="mt-4 space-y-2 text-xs">
+                <div class="flex justify-between py-1 border-b border-slate-800">
+                  <span class="text-slate-400">PZT Acoustic Transducers</span>
+                  <span class="text-emerald-400 font-semibold">3 Sensors (Inlet, Mid, Outlet)</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-800">
+                  <span class="text-slate-400">Inspection Window</span>
+                  <span class="text-slate-200">#1.5 Borosilicate (170 µm)</span>
+                </div>
+                <div class="flex justify-between py-1">
+                  <span class="text-slate-400">Emergency Vent Port</span>
+                  <span class="text-cyan-400 font-semibold">Micro-Bypass Solenoid Valve</span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6">
+              <span class="inline-flex items-center text-xs font-medium text-emerald-400">
+                <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                Cartridge Dock Locked
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 2: Oncology Cell Specimen -->
+          <div class="p-5 rounded-xl border border-[var(--border,#334155)] bg-slate-900/60">
+            <span class="text-xs font-semibold text-purple-400 uppercase">Biological Specimen</span>
+            <h3 class="text-lg font-bold mt-1">Cancer Cell Target</h3>
+            
+            <label class="block text-xs text-slate-400 mt-4 mb-1">Select Cell Model:</label>
+            <select id="cellModelSelect" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
+              <option value="MCF7">MCF-7 (Human Breast Adenocarcinoma 3D Spheroid)</option>
+              <option value="A549">A549 (Non-Small Cell Lung Carcinoma)</option>
+              <option value="CHO_CTC" selected>Fluo-N3DH-CHO (Kaggle Benchmark GT Reference)</option>
+              <option value="HCT116">HCT-116 (Colorectal Carcinoma Organoid)</option>
+            </select>
+
+            <label class="block text-xs text-slate-400 mt-4 mb-1">Initial Seeding Density:</label>
+            <input type="text" value="2.5 × 10^5 cells/mL (Confluent Monolayer)" disabled class="w-full bg-slate-800/60 border border-slate-700 text-slate-300 rounded-lg p-2 text-xs">
+
+            <div class="mt-4 p-3 bg-slate-800/40 rounded-lg border border-slate-700/60 text-xs text-slate-400">
+              <span class="font-semibold text-slate-300">Biomechanical Baseline:</span>
+              Shear modulus $G = 3.356\text{ kPa}$, Krogh necrotic core radius $R_c = 151.2\ \mu\text{m}$.
+            </div>
+          </div>
+
+          <!-- Card 3: Therapeutic Compound -->
+          <div class="p-5 rounded-xl border border-[var(--border,#334155)] bg-slate-900/60 flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-semibold text-amber-400 uppercase">Drug Candidate</span>
+              <h3 class="text-lg font-bold mt-1">Therapeutic Regimen</h3>
+
+              <label class="block text-xs text-slate-400 mt-4 mb-1">Select Compound:</label>
+              <select id="drugSelect" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <option value="Paclitaxel">Paclitaxel (Microtubule Stabilizer / Mitotic Inhibitor)</option>
+                <option value="Doxorubicin">Doxorubicin (DNA Intercalator / Topoisomerase II)</option>
+                <option value="Cisplatin">Cisplatin (DNA Cross-linking Agent)</option>
+                <option value="Vehicle">Vehicle Control (0.1% DMSO Baseline)</option>
+              </select>
+
+              <div class="mt-4">
+                <div class="flex justify-between text-xs text-slate-400 mb-1">
+                  <span>Target Perfusion Concentration:</span>
+                  <span id="drugConcLabel" class="text-cyan-400 font-bold">10.0 µM</span>
+                </div>
+                <input id="drugConcSlider" type="range" min="0" max="50" step="0.5" value="10" oninput="updateDrugConc(this.value)" class="w-full accent-cyan-500">
+              </div>
+            </div>
+
+            <button onclick="goToStep(2)" class="mt-6 w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2">
+              <span>Initialize Cartridge & Start Perfusion</span>
+              <span>➔</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- STEP 2: ACOUSTIC & PERFUSION SHIELD (AURASENSAI)                  -->
+    <!-- ================================================================= -->
+    <section id="stepSection2" class="space-y-6 hidden">
+      <div class="bg-[var(--card,#1e293b)] border border-[var(--border,#334155)] rounded-2xl p-6 shadow-md">
+        <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-[var(--border,#334155)] pb-4 mb-6 gap-4">
+          <div>
+            <span class="text-xs uppercase tracking-wider font-bold text-cyan-400">Step 2 of 5 • Mechanical Safety</span>
+            <h2 class="text-2xl font-bold text-[var(--foreground,#f8fafc)] mt-1">[Simulation] Acoustic Monitoring & Flow-Event Flags — design mode B, no hardware</h2>
+            <p class="text-sm text-[var(--muted-foreground,#94a3b8)]">AURASENSAI monitors 3 PZT piezo sensors to intercept cavitation bubbles and prevent shear-stress delamination.</p>
+          </div>
+          <!-- Live Interactive Control Button for Scientist -->
+          <div class="flex items-center space-x-3">
+            <button onclick="triggerSimulatedBubble()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl shadow transition-all flex items-center space-x-2 text-xs">
+              <span>⚠️ Inject Bubble Perturbation (Test Safety Loop)</span>
+            </button>
+            <button onclick="goToStep(3)" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl shadow transition-all text-xs">
+              Proceed to Spectral ➔
+            </button>
+          </div>
+        </div>
+
+        <!-- Telemetry Metrics Row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400">Apical Flow Rate</span>
+            <div class="text-2xl font-black text-cyan-400 mt-1" id="flowRateVal">10.0 µL/min</div>
+            <span class="text-[11px] text-emerald-400">Laminar (Re = 0.165)</span>
+          </div>
+          <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400">Wall Shear Stress</span>
+            <div class="text-2xl font-black text-slate-200 mt-1" id="shearStressVal">1.00 dyn/cm²</div>
+            <span class="text-[11px] text-slate-400">Safe Limit: &lt; 15.0 dyn/cm²</span>
+          </div>
+          <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400">Inlet Acoustic Resonance</span>
+            <div class="text-2xl font-black text-purple-400 mt-1" id="inletFreqVal">5.2 kHz</div>
+            <span class="text-[11px] text-slate-400">Minnaert Spike Threshold: 80 kHz</span>
+          </div>
+          <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400">Micro-Bypass Valve State</span>
+            <div class="text-xl font-black text-emerald-400 mt-1" id="valveStateVal">NORMAL_PERFUSION</div>
+            <span class="text-[11px] text-cyan-400" id="valveLatencyVal">Latency: simulated (no hardware)</span>
+          </div>
+        </div>
+
+        <!-- Waveform Canvas & Status Feed -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-semibold text-slate-400">PZT-01 Ultrasonic Sensor Live Stream (500 kSps)</span>
+              <span class="text-[11px] text-cyan-400 font-mono">Sampling: Continuous</span>
+            </div>
+            <canvas id="acousticCanvas" class="w-full h-48 bg-slate-950 rounded border border-slate-900"></canvas>
+            <div class="flex justify-between text-[11px] text-slate-500 mt-2">
+              <span>0 ms</span>
+              <span>Time Horizon (Rolling 500 ms)</span>
+              <span>500 ms</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">AuraCell Closed-Loop Protection Log</span>
+              <div id="safetyEventLog" class="mt-3 space-y-2 max-h-44 overflow-y-auto text-xs font-mono">
+                <div class="text-slate-400">[00:00:01] Bio-Cartridge online. Perfusion stable at 10.0 µL/min.</div>
+                <div class="text-emerald-400">[00:00:02] PZT-02 MCG signal synchronized (1.2 Hz heartbeat).</div>
+                <div class="text-slate-400">[00:00:03] PZT-03 differential pressure: 144 Pa (Clear, no clog).</div>
+              </div>
+            </div>
+            <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs text-emerald-300 mt-4">
+              <strong>HIL Verdict:</strong> Closed-loop safety active. Any sudden bubble trigger automatically vents through Micro-Bypass Port without cell trauma.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- STEP 3: REDOX METABOLIC SCREENING (SpectrumaX)                   -->
+    <!-- ================================================================= -->
+    <section id="stepSection3" class="space-y-6 hidden">
+      <div class="bg-[var(--card,#1e293b)] border border-[var(--border,#334155)] rounded-2xl p-6 shadow-md">
+        <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-[var(--border,#334155)] pb-4 mb-6 gap-4">
+          <div>
+            <span class="text-xs uppercase tracking-wider font-bold text-cyan-400">Step 3 of 5 • Biochemical Phenotyping</span>
+            <h2 class="text-2xl font-bold text-[var(--foreground,#f8fafc)] mt-1">[Simulation] 16-Band Hyperspectral & Optical Redox Ratio (ORR) — design concept</h2>
+            <p class="text-sm text-[var(--muted-foreground,#94a3b8)]">SpectrumaX measures NADH autofluorescence (460 nm) and FAD (535 nm) to calculate cellular redox state non-destructively.</p>
+          </div>
+          <button onclick="goToStep(4)" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl shadow transition-all text-xs">
+            Proceed to 4D Tracking ➔
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Spectral Controls & Summary -->
+          <div class="space-y-4">
+            <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
+              <span class="text-xs text-slate-400">Computed Optical Redox Ratio (ORR)</span>
+              <div class="text-3xl font-black text-cyan-400 mt-1" id="orrDisplayVal">0.3208</div>
+              <p class="text-xs text-slate-400 mt-1 font-mono">Formula: ORR = NADH / (NADH + FAD)</p>
+              <div class="mt-3 p-2 bg-purple-500/10 border border-purple-500/30 rounded text-xs text-purple-300">
+                <strong>[Design] Metabolic gate concept:</strong><br>
+                ORR = FAD/(NADH+FAD) (Skala convention). Idea: a division proposal whose cells show strongly oxidised ORR would receive a soft penalty, not a hard veto. No spectral data were used in this project; this panel is a simulation.
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800">
+              <span class="text-xs text-slate-400">Cancer Apoptosis Indicator</span>
+              <div class="text-lg font-bold text-amber-400 mt-1" id="apoptosisStatus">Mitochondrial Shift Detected</div>
+              <p class="text-xs text-slate-400 mt-1">Drug treatment induces oxidative stress, decreasing NADH prior to cell detachment.</p>
+            </div>
+          </div>
+
+          <!-- Spectral Signature Canvas -->
+          <div class="lg:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-semibold text-slate-400">16-Band Hyperspectral Emission Profile (400 - 1000 nm)</span>
+              <span class="text-xs text-purple-400 font-semibold">NADH: 460nm | FAD: 535nm</span>
+            </div>
+            <canvas id="spectralCanvas" class="w-full h-56 bg-slate-950 rounded border border-slate-900"></canvas>
+            <div class="grid grid-cols-4 text-center text-[11px] text-slate-400 mt-3 pt-2 border-t border-slate-800">
+              <div><strong class="text-cyan-400">460 nm (NADH):</strong> <span id="nadhVal">145.2 RFU</span></div>
+              <div><strong class="text-amber-400">535 nm (FAD):</strong> <span id="fadVal">307.3 RFU</span></div>
+              <div><strong class="text-rose-400">660 nm (HbO2):</strong> <span>94.03% sO2</span></div>
+              <div><strong class="text-emerald-400">930 nm (Lipid):</strong> <span>0.360 ΔOD</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- STEP 4: 4D CELL TRACKING & MITOSIS (Velocell)                    -->
+    <!-- ================================================================= -->
+    <section id="stepSection4" class="space-y-6 hidden">
+      <div class="bg-[var(--card,#1e293b)] border border-[var(--border,#334155)] rounded-2xl p-6 shadow-md">
+        <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-[var(--border,#334155)] pb-4 mb-6 gap-4">
+          <div>
+            <span class="text-xs uppercase tracking-wider font-bold text-cyan-400">Step 4 of 5 • Kinematic Lineage</span>
+            <h2 class="text-2xl font-bold text-[var(--foreground,#f8fafc)] mt-1">4D Cell Tracking, Spatio-Temporal Lineage & Mitosis</h2>
+            <p class="text-sm text-[var(--muted-foreground,#94a3b8)]">Left: demo animation. Right: <b>measured</b> results of the frame-pair network-flow ILP (link / divide / appear / disappear) with a calibrated soft biological gate, evaluated with official CTC metrics.</p>
+          </div>
+          <button onclick="goToStep(5)" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl shadow transition-all text-xs">
+            Audit export ➔
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Simulation Canvas of Cells -->
+          <div class="lg:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-semibold text-slate-400">Interactive Microfluidic Chamber Viewport (4D Spatial)</span>
+              <div class="flex items-center space-x-2 text-xs">
+                <button onclick="toggleCellSimulation()" id="simToggleBtn" class="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold rounded">Pause Stream</button>
+                <span class="text-slate-400">Active Tracks: <strong class="text-cyan-400" id="liveTrackCount">42</strong></span>
+              </div>
+            </div>
+            <canvas id="cellCanvas" class="w-full h-72 bg-slate-950 rounded border border-slate-900"></canvas>
+            <div class="flex items-center justify-between text-xs text-slate-400 mt-2">
+              <div class="flex items-center space-x-4">
+                <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 mr-1.5"></span> Interphase Tumor Cell</span>
+                <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 mr-1.5"></span> Mitotic Telophase (Dividing)</span>
+                <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-1.5"></span> Apoptotic / Drug Arrested</span>
+              </div>
+              <span class="text-emerald-400 font-mono font-bold">Demo animation — not measured data</span>
+            </div>
+          </div>
+
+          <!-- MEASURED RESULTS PANEL (real data via evaluate.py; needs launch_gui.py server) -->
+          <div class="space-y-4">
+            <div class="p-4 bg-slate-900/60 rounded-xl border border-emerald-800">
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-emerald-400 uppercase font-bold tracking-wider">[Measured] CTC Fluo-N3DH-CHO</span>
+                <span id="apiBadge" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">checking server…</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Official DET/TRA via py-ctcmetrics. Produced by <code>evaluate.py</code>, read from <code>results/ablation.json</code>.</p>
+              <div class="flex flex-wrap gap-2 mt-3">
+                <button onclick="loadResults()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded">Load results</button>
+                <button onclick="runBenchmark('quick')" id="runQuickBtn" class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded">Run quick benchmark (seq 01, ≈2–4 min)</button>
+                <button onclick="runBenchmark('full')" id="runFullBtn" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded">Run full ablation (15–30 min)</button>
+              </div>
+              <div id="runStatus" class="text-[11px] text-slate-400 mt-2 font-mono whitespace-pre-wrap max-h-28 overflow-y-auto"></div>
+              <div id="resultsTableWrap" class="mt-3 overflow-x-auto">
+                <table class="w-full text-[11px]" id="resultsTable">
+                  <thead class="text-slate-400 border-b border-slate-800">
+                    <tr><th class="text-left py-1">seq</th><th class="text-left">det</th><th class="text-left">tracker</th><th class="text-right">DET</th><th class="text-right">TRA</th><th class="text-right">div pred/GT</th><th class="text-right">mitosis F1</th></tr>
+                  </thead>
+                  <tbody id="resultsBody"><tr><td colspan="7" class="py-2 text-slate-500">No results loaded yet. Click “Load results” (requires <code>python gui/launch_gui.py</code>) or run the benchmark.</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800 text-xs">
+              <span class="text-xs font-bold text-slate-300">How to read</span>
+              <p class="text-slate-400 mt-1">det=<b>gt</b>: detections from ground truth → DET=1 by construction, TRA measures linking only. det=<b>otsu</b>: label-free baseline. Lower “div pred/GT” at equal TRA = fewer false divisions. Mitosis F1 is an open limitation (few GT events).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- STEP 5: REGULATORY DOSSIER & PDF EXPORT (FDA / NMPA)             -->
+    <!-- ================================================================= -->
+    <section id="stepSection5" class="space-y-6 hidden">
+      <div class="bg-[var(--card,#1e293b)] border border-[var(--border,#334155)] rounded-2xl p-6 shadow-md">
+        <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-[var(--border,#334155)] pb-4 mb-6 gap-4">
+          <div>
+            <span class="text-xs uppercase tracking-wider font-bold text-emerald-400">Step 5 of 5 • Final Dossier</span>
+            <h2 class="text-2xl font-bold text-[var(--foreground,#f8fafc)] mt-1">Audit Export — what was measured, what is design</h2>
+            <p class="text-sm text-[var(--muted-foreground,#94a3b8)]">Exports a JSON with the measured rows loaded in Step 4 plus explicit labels for every simulated panel. Regulatory-format dossiers (FDA/NMPA) are a roadmap item, not a feature.</p>
+          </div>
+          <button onclick="downloadReport()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black rounded-xl shadow-lg transition-all text-xs flex items-center space-x-2">
+            <span>📄 Download audit export (JSON)</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-5 rounded-xl border border-slate-800 bg-slate-900/60">
+            <span class="text-xs font-bold text-emerald-400 uppercase">[Measured] Tracking (CTC Fluo-N3DH-CHO)</span>
+            <h3 class="text-xl font-black text-cyan-400 mt-1">ILP TRA 0.9976 / 0.9964</h3>
+            <p class="text-xs text-slate-300 mt-2">GT detections, sequences 01 / 02, official py-ctcmetrics. Greedy baseline: 0.9276 / 0.9426.</p>
+
+            <div class="mt-4 pt-3 border-t border-slate-800 space-y-1.5 text-xs text-slate-400">
+              <div class="flex justify-between">
+                <span>False divisions (seq 01):</span>
+                <span class="text-slate-200 font-semibold">178 → 5</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Mitosis F1 (best, open limitation):</span>
+                <span class="text-amber-300 font-semibold">0.222</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Label-free DET (Otsu baseline):</span>
+                <span class="text-amber-300 font-semibold">0.40 / 0.53</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 rounded-xl border border-slate-800 bg-slate-900/60">
+            <span class="text-xs font-bold text-amber-400 uppercase">[Design] Flow safety thresholds</span>
+            <h3 class="text-xl font-black text-slate-200 mt-1">Not validated on hardware</h3>
+            <p class="text-xs text-slate-300 mt-2">Decision table (continue / flag / stop) in writeup §3.3. Values below are computed from cartridge geometry, not measured.</p>
+            
+            <div class="mt-4 pt-3 border-t border-slate-800 space-y-1.5 text-xs text-slate-400">
+              <div class="flex justify-between">
+                <span>Max Wall Shear Stress:</span>
+                <span class="text-slate-200 font-semibold">1.00 dyn/cm² (1000×100 µm, 10 µL/min)</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Safety Valve:</span>
+                <span class="text-slate-200 font-semibold">design concept (not built)</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Total Perfusion Volume:</span>
+                <span class="text-slate-200 font-semibold">14.4 mL (24 hrs)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 rounded-xl border border-slate-800 bg-slate-900/60">
+            <span class="text-xs font-bold text-slate-400 uppercase">Physics consistency checks</span>
+            <h3 class="text-xl font-black text-purple-400 mt-1">15 internal unit tests</h3>
+            <p class="text-xs text-slate-300 mt-2">Closed-form checks (Poiseuille, Minnaert, Womersley, Krogh, Hertz, thin plate) against reference constants. Not a literature validation.</p>
+            
+            <div class="mt-4 pt-3 border-t border-slate-800 space-y-1.5 text-xs text-slate-400">
+              <div class="flex justify-between">
+                <span>Category:</span>
+                <span class="text-purple-300 font-semibold">Model &amp; Algorithm</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Cell Tracking Challenge:</span>
+                <span class="text-slate-200 font-semibold">Fluo-N3DH-CHO (training set, not OoC)</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Real OoC / acoustic data:</span>
+                <span class="text-amber-300 font-semibold">none yet (roadmap)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+          <div>
+            <strong>Measured source:</strong> <span class="font-mono text-cyan-400">results/ablation.json (evaluate.py)</span> •
+            <strong>Hardware:</strong> <span class="font-mono text-slate-300">none — Steps 2–3 are simulations</span>
+          </div>
+          <span class="text-slate-400 font-semibold">Local run only — see docs/AUDIT_KLAIM.md</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JAVASCRIPT: WORKFLOW LOGIC & INTERACTIVE PLOTS -->
+  <script>
+    let currentStep = 1;
+    let simActive = true;
+    let drugConc = 10.0;
+
+    // STEP NAVIGATION
+    function goToStep(step) {
+      currentStep = step;
+      for (let i = 1; i <= 5; i++) {
+        const sec = document.getElementById('stepSection' + i);
+        const tab = document.getElementById('stepTab' + i);
+        if (i === step) {
+          sec.classList.remove('hidden');
+          tab.classList.remove('bg-[var(--card,#1e293b)]', 'text-[var(--muted-foreground,#94a3b8)]');
+          tab.classList.add('bg-cyan-600', 'text-white', 'font-semibold');
+        } else {
+          sec.classList.add('hidden');
+          tab.classList.add('bg-[var(--card,#1e293b)]', 'text-[var(--muted-foreground,#94a3b8)]');
+          tab.classList.remove('bg-cyan-600', 'text-white', 'font-semibold');
+        }
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateDrugConc(val) {
+      drugConc = parseFloat(val);
+      document.getElementById('drugConcLabel').innerText = drugConc.toFixed(1) + ' µM';
+      
+      // Update ORR based on drug concentration
+      const orr = Math.max(0.20, 0.3208 - (drugConc * 0.0025)).toFixed(4);
+      const orrEl = document.getElementById('orrDisplayVal');
+      if (orrEl) orrEl.innerText = orr;
+    }
+
+    // SIMULATED BUBBLE TRIGGER (Scientist Interactive Safety Test)
+    function triggerSimulatedBubble() {
+      const freqEl = document.getElementById('inletFreqVal');
+      const valveEl = document.getElementById('valveStateVal');
+      const latencyEl = document.getElementById('valveLatencyVal');
+      const logEl = document.getElementById('safetyEventLog');
+
+      freqEl.innerText = '~109.6 kHz (simulated) ⚠️';
+      freqEl.classList.remove('text-purple-400');
+      freqEl.classList.add('text-amber-400');
+
+      valveEl.innerText = 'BYPASS_VENTING';
+      valveEl.classList.remove('text-emerald-400');
+      valveEl.classList.add('text-amber-400');
+
+      const entry = document.createElement('div');
+      entry.className = 'text-amber-400 font-bold';
+      entry.innerText = `[${new Date().toLocaleTimeString()}] ⚠️ [SIMULATION] ~110 kHz Minnaert-band burst injected → FLAG: timestamp logged, extra snapshot requested (no hardware actuation).`;
+      logEl.prepend(entry);
+
+      // Flash acoustic canvas
+      bubblePulse = 1.0;
+
+      setTimeout(() => {
+        freqEl.innerText = '5.2 kHz';
+        freqEl.classList.add('text-purple-400');
+        freqEl.classList.remove('text-amber-400');
+
+        valveEl.innerText = 'NORMAL_PERFUSION';
+        valveEl.classList.add('text-emerald-400');
+        valveEl.classList.remove('text-amber-400');
+      }, 3500);
+    }
+
+    // CANVAS 1: ACOUSTIC WAVEFORM
+    let bubblePulse = 0;
+    const acCanvas = document.getElementById('acousticCanvas');
+    const acCtx = acCanvas.getContext('2d');
+    let acPhase = 0;
+
+    function drawAcoustic() {
+      if (!acCanvas) return;
+      acCanvas.width = acCanvas.clientWidth;
+      acCanvas.height = acCanvas.clientHeight;
+      const w = acCanvas.width;
+      const h = acCanvas.height;
+
+      acCtx.clearRect(0, 0, w, h);
+      acCtx.strokeStyle = bubblePulse > 0 ? '#f59e0b' : '#38bdf8';
+      acCtx.lineWidth = bubblePulse > 0 ? 3 : 1.5;
+      acCtx.beginPath();
+
+      const midY = h / 2;
+      for (let x = 0; x < w; x++) {
+        const t = (x / w) * 10 + acPhase;
+        let amp = 15;
+        if (bubblePulse > 0) {
+          amp = 50 * bubblePulse * Math.sin(t * 5);
+        }
+        const y = midY + Math.sin(t) * amp + (Math.random() - 0.5) * 4;
+        if (x === 0) acCtx.moveTo(x, y);
+        else acCtx.lineTo(x, y);
+      }
+      acCtx.stroke();
+
+      if (bubblePulse > 0) {
+        bubblePulse = Math.max(0, bubblePulse - 0.02);
+      }
+      acPhase += 0.15;
+      requestAnimationFrame(drawAcoustic);
+    }
+
+    // CANVAS 2: SPECTRAL BANDS
+    const spCanvas = document.getElementById('spectralCanvas');
+    const spCtx = spCanvas.getContext('2d');
+
+    function drawSpectral() {
+      if (!spCanvas) return;
+      spCanvas.width = spCanvas.clientWidth;
+      spCanvas.height = spCanvas.clientHeight;
+      const w = spCanvas.width;
+      const h = spCanvas.height;
+
+      spCtx.clearRect(0, 0, w, h);
+
+      const bands = [
+        { nm: 420, val: 0.35, col: '#818cf8' },
+        { nm: 460, val: 0.72, col: '#38bdf8', label: 'NADH' },
+        { nm: 500, val: 0.55, col: '#2dd4bf' },
+        { nm: 535, val: 0.88, col: '#f59e0b', label: 'FAD' },
+        { nm: 570, val: 0.45, col: '#fbbf24' },
+        { nm: 610, val: 0.30, col: '#fb923c' },
+        { nm: 660, val: 0.65, col: '#f43f5e', label: 'HbO2' },
+        { nm: 700, val: 0.25, col: '#e11d48' },
+        { nm: 750, val: 0.20, col: '#be123c' },
+        { nm: 800, val: 0.22, col: '#9f1239' },
+        { nm: 850, val: 0.18, col: '#881337' },
+        { nm: 900, val: 0.30, col: '#4c0519' },
+        { nm: 930, val: 0.58, col: '#10b981', label: 'Lipid' },
+        { nm: 960, val: 0.32, col: '#059669' },
+        { nm: 980, val: 0.28, col: '#047857' },
+        { nm: 1000, val: 0.22, col: '#065f46' }
+      ];
+
+      const barWidth = (w - 60) / bands.length;
+      bands.forEach((b, i) => {
+        const x = 30 + i * barWidth;
+        const barH = b.val * (h - 50);
+        const y = h - 25 - barH;
+
+        spCtx.fillStyle = b.col;
+        spCtx.fillRect(x + 2, y, barWidth - 4, barH);
+
+        // Labels
+        spCtx.fillStyle = '#64748b';
+        spCtx.font = '9px monospace';
+        spCtx.fillText(b.nm, x + 2, h - 10);
+
+        if (b.label) {
+          spCtx.fillStyle = '#ffffff';
+          spCtx.font = 'bold 10px sans-serif';
+          spCtx.fillText(b.label, x, y - 6);
+        }
+      });
+    }
+
+    // CANVAS 3: 4D CELL TRACKING SIMULATION
+    const clCanvas = document.getElementById('cellCanvas');
+    const clCtx = clCanvas.getContext('2d');
+    let cells = [];
+
+    function initCells() {
+      cells = [];
+      for (let i = 0; i < 35; i++) {
+        cells.push({
+          x: Math.random() * 500 + 50,
+          y: Math.random() * 200 + 40,
+          vx: (Math.random() - 0.5) * 0.4 + 0.2, // bias towards flow
+          vy: (Math.random() - 0.5) * 0.3,
+          r: Math.random() * 4 + 7,
+          state: Math.random() > 0.85 ? 'mitosis' : (Math.random() > 0.8 ? 'arrested' : 'interphase'),
+          track: []
+        });
+      }
+    }
+
+    function toggleCellSimulation() {
+      simActive = !simActive;
+      document.getElementById('simToggleBtn').innerText = simActive ? 'Pause Stream' : 'Resume Stream';
+    }
+
+    function drawCells() {
+      if (!clCanvas) return;
+      clCanvas.width = clCanvas.clientWidth;
+      clCanvas.height = clCanvas.clientHeight;
+      const w = clCanvas.width;
+      const h = clCanvas.height;
+
+      clCtx.clearRect(0, 0, w, h);
+
+      // Draw microfluidic channel borders
+      clCtx.strokeStyle = '#334155';
+      clCtx.lineWidth = 2;
+      clCtx.strokeRect(10, 10, w - 20, h - 20);
+
+      // Flow direction arrows
+      clCtx.fillStyle = '#1e293b';
+      for (let x = 40; x < w - 40; x += 80) {
+        clCtx.fillText('➔ flow', x, 25);
+      }
+
+      cells.forEach(c => {
+        if (simActive) {
+          c.x += c.vx;
+          c.y += c.vy;
+
+          if (c.x > w - 25) c.x = 25;
+          if (c.x < 25) c.x = w - 25;
+          if (c.y > h - 25 || c.y < 25) c.vy *= -1;
+
+          c.track.push({ x: c.x, y: c.y });
+          if (c.track.length > 20) c.track.shift();
+        }
+
+        // Draw track tail
+        if (c.track.length > 1) {
+          clCtx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+          clCtx.lineWidth = 1.5;
+          clCtx.beginPath();
+          c.track.forEach((p, idx) => {
+            if (idx === 0) clCtx.moveTo(p.x, p.y);
+            else clCtx.lineTo(p.x, p.y);
+          });
+          clCtx.stroke();
+        }
+
+        // Draw cell body
+        clCtx.beginPath();
+        clCtx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+        if (c.state === 'mitosis') {
+          clCtx.fillStyle = '#fbbf24'; // Yellow dividing
+          clCtx.shadowColor = '#fbbf24';
+          clCtx.shadowBlur = 10;
+        } else if (c.state === 'arrested') {
+          clCtx.fillStyle = '#f43f5e'; // Red arrested
+          clCtx.shadowColor = '#f43f5e';
+          clCtx.shadowBlur = 8;
+        } else {
+          clCtx.fillStyle = '#38bdf8'; // Cyan normal
+          clCtx.shadowBlur = 0;
+        }
+        clCtx.fill();
+        clCtx.shadowBlur = 0;
+      });
+
+      requestAnimationFrame(drawCells);
+    }
+
+    // ---------- MEASURED RESULTS (real data; talks to gui/launch_gui.py) ----------
+    let lastResults = null;
+    let pollTimer = null;
+    const isServed = location.protocol.startsWith('http');
+
+    function setBadge(text, cls) {
+      const b = document.getElementById('apiBadge');
+      b.innerText = text; b.className = 'text-[10px] px-2 py-0.5 rounded ' + cls;
+    }
+
+    async function checkServer() {
+      if (!isServed) { setBadge('file:// mode — start python gui/launch_gui.py for live data', 'bg-amber-900 text-amber-300'); return false; }
+      try { const r = await fetch('/api/status'); if (r.ok) { setBadge('local API connected', 'bg-emerald-900 text-emerald-300'); return true; } }
+      catch (e) {}
+      setBadge('API not reachable', 'bg-rose-900 text-rose-300'); return false;
+    }
+
+    function rowHtml(r, tag) {
+      const f1 = r.F1 !== undefined ? r.F1 : r.mitosis_f1;
+      const best = (r.tracker || '').startsWith('ilp_gate');
+      return `<tr class="border-b border-slate-800/60 ${best ? 'text-emerald-300' : 'text-slate-300'}">
+        <td class="py-1">${r.seq}</td><td>${r.detect}</td><td>${r.tracker}${tag ? ' <span class="text-[9px] px-1 rounded bg-cyan-900 text-cyan-300">' + tag + '</span>' : ''}</td>
+        <td class="text-right font-mono">${Number(r.DET).toFixed(3)}</td>
+        <td class="text-right font-mono">${Number(r.TRA).toFixed(4)}</td>
+        <td class="text-right font-mono">${r.mitosis_pred}/${r.mitosis_gt}</td>
+        <td class="text-right font-mono">${Number(f1).toFixed(3)}</td></tr>`;
+    }
+
+    function renderResults(data) {
+      lastResults = data;
+      const body = document.getElementById('resultsBody');
+      const full = data.full || null, quick = data.quick || null;
+      const fullRows = ((full && full.rows) || []).filter(r => !r.error);
+      const quickRows = ((quick && quick.rows) || []).filter(r => !r.error);
+      if (!fullRows.length && !quickRows.length) { body.innerHTML = '<tr><td colspan="7" class="py-2 text-slate-500">No rows found.</td></tr>'; return; }
+      let html = '';
+      if (fullRows.length) html += `<tr><td colspan="7" class="pt-2 pb-1 text-slate-400 font-bold">Full ablation (results/ablation.json)</td></tr>` + fullRows.map(r => rowHtml(r, '')).join('');
+      if (quickRows.length) html += `<tr><td colspan="7" class="pt-3 pb-1 text-cyan-400 font-bold">Quick benchmark run from this UI (results/quick/)</td></tr>` + quickRows.map(r => rowHtml(r, 'local')).join('');
+      body.innerHTML = html;
+      const src = full || quick;
+      const cal = src && src.gate_calibration ? JSON.stringify(src.gate_calibration) : '';
+      document.getElementById('runStatus').innerText = `Loaded ${fullRows.length} full + ${quickRows.length} quick rows. ${(full && full.run) || ''}\ngate calibration: ${cal}`;
+    }
+
+    async function loadResults() {
+      if (!(await checkServer())) return;
+      const r = await fetch('/api/results');
+      const j = await r.json();
+      if (!r.ok) { document.getElementById('runStatus').innerText = j.error; return; }
+      renderResults(j);
+    }
+
+    async function runBenchmark(preset) {
+      if (!(await checkServer())) return;
+      const r = await fetch('/api/run?preset=' + preset, { method: 'POST' });
+      const j = await r.json();
+      document.getElementById('runStatus').innerText = r.ok ? `started preset=${preset} …` : j.error;
+      if (!r.ok) return;
+      document.getElementById('runQuickBtn').disabled = true; document.getElementById('runFullBtn').disabled = true;
+      clearInterval(pollTimer);
+      pollTimer = setInterval(async () => {
+        const s = await (await fetch('/api/status')).json();
+        document.getElementById('runStatus').innerText = s.log_tail.join('\n');
+        if (!s.running) {
+          clearInterval(pollTimer);
+          document.getElementById('runQuickBtn').disabled = false; document.getElementById('runFullBtn').disabled = false;
+          if (s.returncode === 0) loadResults();
+          else document.getElementById('runStatus').innerText += `\n[exit code ${s.returncode}]`;
+        }
+      }, 2000);
+    }
+
+    function downloadReport() {
+      // Exports what was actually measured; no fabricated PDF.
+      const payload = {
+        generated: new Date().toISOString(),
+        source: 'AuraCell 4D GUI — Step 5 export',
+        note: 'Measured rows come from results/ablation.json (evaluate.py). Acoustic/spectral panels in this GUI are simulations.',
+        measured: lastResults,
+        design_thresholds_ref: 'writeup.md Section 3.3'
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'auracell4d_audit_export.json'; a.click();
+      if (!lastResults) alert('Export created, but no measured results were loaded. Go to Step 4 → Load results first.');
+    }
+
+    // Initialize all canvas on load
+    window.addEventListener('load', () => {
+      initCells();
+      drawAcoustic();
+      drawSpectral();
+      drawCells();
+      checkServer().then(ok => { if (ok) loadResults(); });
+    });
+  </script>
+</body>
+</html>

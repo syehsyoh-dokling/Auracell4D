@@ -1,0 +1,10 @@
+# datasets (downloaded by evaluate.py)
+data/
+# tracker outputs (keep ablation.md/json, drop the heavy CTC result folders)
+results/*_RES/
+results/*_DET/
+results/quick/*_RES/
+results/quick/*_DET/
+# python
+__pycache__/
+*.pyc

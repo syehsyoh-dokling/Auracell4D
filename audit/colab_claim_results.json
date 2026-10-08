@@ -1,0 +1,29 @@
+{
+  "run": "Google Colab, 2026-10-08, notebook Untitled4.ipynb (akun Saifuddin), skrip audit/colab_claim_audit.py via gist",
+  "K1_drive_inventory": {
+    "path": "/content/drive/MyDrive/AuraCell4D_Datasets",
+    "folder_ada": true,
+    "isi": ["benchmark_raw (kosong)", "ground_truth (kosong)"],
+    "jumlah_berkas": 0,
+    "berkas_audio": 0,
+    "manifest_10k": false,
+    "verdict": "TIDAK DIDUKUNG",
+    "fakta": "Klaim '10.000 rekaman suara mikro di Google Drive' tidak punya satu pun berkas. Notebook asli hanya akan men-generate manifest JSON acak saat dijalankan."
+  },
+  "K5_model_weights": {"ditemukan": [], "verdict": "TIDAK DIDUKUNG", "fakta": "Tidak ada .pt/.ckpt/.safetensors/.onnx di Drive maupun repo."},
+  "K2_ctc_dataset": {
+    "01": {"n_tracks": 27, "n_divisions_daughters": 10, "n_frames": 92, "shape_ZYX": [5, 443, 512]},
+    "02": {"n_tracks": 24, "n_divisions_daughters": 6, "n_frames": 92, "shape_ZYX": [5, 443, 512]},
+    "metadata_resmi_CTC": {"sel": "CHO nuclei GFP-PCNA", "mikroskop": "Zeiss LSM 510 confocal 63x/1.4 oil",
+      "voxel_um": [0.202, 0.202, 1.0], "time_step_min": 9.5, "sumber": "Dr. J. Essers, Erasmus MC Rotterdam", "organ_on_chip": false}
+  },
+  "K3_velocell_real_ctc": {
+    "metode": "Tracker Velocell (salinan persis src/vision_4d/mitosis_ilp.py) dijalankan pada centroid+volume dari mask GT TRA (deteksi sempurna). Mask di-relabel per track hasil tracker, dievaluasi dengan py-ctcmetrics (metrik resmi CTC).",
+    "01": {"frames": 92, "DET": 1.0, "TRA": 0.99831, "AOGM": 17.5, "AOGM_ED": 1, "AOGM_EA": 11, "pred_daughters": 0, "gt_daughters": 10, "sec_per_volume": 0.11},
+    "02": {"frames": 92, "DET": 1.0, "TRA": 0.99872, "AOGM": 9.0, "AOGM_ED": 0, "AOGM_EA": 6, "pred_daughters": 0, "gt_daughters": 6, "sec_per_volume": 0.119},
+    "mitosis_recall": 0.0,
+    "mitosis_f1": 0.0,
+    "interpretasi": "DET=1 by construction. TRA tinggi hanya karena linking 1-1 pada deteksi sempurna. Tracker TIDAK mendeteksi satu pun dari 16 mitosis nyata (AOGM_EA = jumlah edge induk->anak yang hilang). Klaim Mitosis F1 0.906 (writeup) / 0.991 (laporan) tidak dapat direproduksi; nilai nyata = 0."
+  },
+  "K4_anaphase_measurable": {"time_step_min": 9.5, "anaphase_duration_min": [5, 10], "frames_in_anaphase": [0.53, 1.05], "verdict": "TIDAK TERBUKTI"}
+}

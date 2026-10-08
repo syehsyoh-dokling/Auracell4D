@@ -1,0 +1,27 @@
+{
+  "run": "Google Colab CPU, 2026-10-08, python evaluate.py --data ./data --out ./results",
+  "dataset": "CTC Fluo-N3DH-CHO training 01 & 02, 92 frames each, 5x443x512, spacing_um_zyx [1.0,0.202,0.202], dt_min 9.5",
+  "gate_calibration": {"calib_seq": "02", "n_divisions": 3, "daughter_ratio_p5_p50_p95": [1.0, 1.0, 1.0], "mass_ratio_p5_p50_p95": [2.0, 2.0, 2.0], "ratio_max": 1.1, "mass_min": 1.8, "mass_max": 2.2,
+    "note": "GT TRA masks are uniform-size markers, not segmentations; original +/-15% mass gate (0.85-1.15) therefore rejects every true division."},
+  "gate_original": {"ratio_min": 0.75, "ratio_max": 1.35, "mass_min": 0.85, "mass_max": 1.15},
+  "rows": [
+    {"seq": "01", "detect": "gt", "tracker": "greedy_nogate", "DET": 1.0, "TRA": 0.9276, "mitosis_pred": 178, "mitosis_gt": 4, "mitosis_tp": 1, "P": 0.006, "R": 0.25, "F1": 0.011, "sec_per_volume": 0.143},
+    {"seq": "01", "detect": "gt", "tracker": "greedy_gate", "DET": 1.0, "TRA": 0.9587, "mitosis_pred": 86, "mitosis_gt": 4, "mitosis_tp": 2, "P": 0.023, "R": 0.5, "F1": 0.044, "sec_per_volume": 0.149},
+    {"seq": "01", "detect": "gt", "tracker": "ilp_nogate", "DET": 1.0, "TRA": 0.997, "mitosis_pred": 8, "mitosis_gt": 4, "mitosis_tp": 1, "P": 0.125, "R": 0.25, "F1": 0.167, "sec_per_volume": 0.153},
+    {"seq": "01", "detect": "gt", "tracker": "ilp_gate", "DET": 1.0, "TRA": 0.9976, "mitosis_pred": 5, "mitosis_gt": 4, "mitosis_tp": 1, "P": 0.2, "R": 0.25, "F1": 0.222, "sec_per_volume": 0.15},
+    {"seq": "01", "detect": "gt", "tracker": "greedy_gate_ORIGINAL(+/-15%)", "DET": 1.0, "TRA": 0.9983, "mitosis_pred": 0, "mitosis_gt": 4, "mitosis_tp": 0, "P": 0.0, "R": 0.0, "F1": 0.0, "sec_per_volume": 0.11},
+    {"seq": "01", "detect": "otsu", "tracker": "greedy_nogate", "DET": 0.4011, "TRA": 0.3652, "mitosis_pred": 578, "mitosis_gt": 4, "mitosis_tp": 4, "P": 0.007, "R": 0.5, "F1": 0.014, "sec_per_volume": 0.644},
+    {"seq": "01", "detect": "otsu", "tracker": "greedy_gate", "DET": 0.4011, "TRA": 0.3914, "mitosis_pred": 19, "mitosis_gt": 4, "mitosis_tp": 0, "P": 0.0, "R": 0.0, "F1": 0.0, "sec_per_volume": 0.12},
+    {"seq": "01", "detect": "otsu", "tracker": "ilp_nogate", "DET": 0.4011, "TRA": 0.3887, "mitosis_pred": 176, "mitosis_gt": 4, "mitosis_tp": 0, "P": 0.0, "R": 0.0, "F1": 0.0, "sec_per_volume": 0.136},
+    {"seq": "01", "detect": "otsu", "tracker": "ilp_gate", "DET": 0.4011, "TRA": 0.3919, "mitosis_pred": 63, "mitosis_gt": 4, "mitosis_tp": 0, "P": 0.0, "R": 0.0, "F1": 0.0, "sec_per_volume": 0.137},
+    {"seq": "02", "detect": "gt", "tracker": "greedy_nogate", "DET": 1.0, "TRA": 0.9426, "mitosis_pred": 103, "mitosis_gt": 3, "mitosis_tp": 2, "P": 0.019, "R": 0.333, "F1": 0.037, "sec_per_volume": 0.108},
+    {"seq": "02", "detect": "gt", "tracker": "greedy_gate", "DET": 1.0, "TRA": 0.9426, "mitosis_pred": 103, "mitosis_gt": 3, "mitosis_tp": 2, "P": 0.019, "R": 0.333, "F1": 0.037, "sec_per_volume": 0.12},
+    {"seq": "02", "detect": "gt", "tracker": "ilp_nogate", "DET": 1.0, "TRA": 0.9964, "mitosis_pred": 7, "mitosis_gt": 3, "mitosis_tp": 0, "P": 0.0, "R": 0.0, "F1": 0.0, "sec_per_volume": 0.121},
+    {"seq": "02", "detect": "gt", "tracker": "ilp_gate", "DET": 1.0, "TRA": 0.9964, "mitosis_pred": 7, "mitosis_gt": 3, "mitosis_tp": 0, "P": 0.0, "R": 0.0, "F1": 0.0, "sec_per_volume": 0.116},
+    {"seq": "02", "detect": "gt", "tracker": "greedy_gate_ORIGINAL(+/-15%)", "DET": 1.0, "TRA": 0.9987, "mitosis_pred": 0, "mitosis_gt": 3, "mitosis_tp": 0, "P": 0.0, "R": 0.0, "F1": 0.0, "sec_per_volume": 0.119},
+    {"seq": "02", "detect": "otsu", "tracker": "greedy_nogate", "DET": 0.5262, "TRA": 0.4761, "mitosis_pred": 495, "mitosis_gt": 3, "mitosis_tp": 2, "P": 0.004, "R": 0.333, "F1": 0.008, "sec_per_volume": 0.698},
+    {"seq": "02", "detect": "otsu", "tracker": "greedy_gate", "DET": 0.5262, "TRA": 0.5091, "mitosis_pred": 13, "mitosis_gt": 3, "mitosis_tp": 1, "P": 0.077, "R": 0.333, "F1": 0.125, "sec_per_volume": 0.111},
+    {"seq": "02", "detect": "otsu", "tracker": "ilp_nogate", "DET": 0.5262, "TRA": 0.5087, "mitosis_pred": 138, "mitosis_gt": 3, "mitosis_tp": 0, "P": 0.0, "R": 0.0, "F1": 0.0, "sec_per_volume": 0.133},
+    {"seq": "02", "detect": "otsu", "tracker": "ilp_gate", "DET": 0.5262, "TRA": 0.5117, "mitosis_pred": 32, "mitosis_gt": 3, "mitosis_tp": 0, "P": 0.0, "R": 0.0, "F1": 0.0, "sec_per_volume": 0.132}
+  ]
+}

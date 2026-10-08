@@ -1,0 +1,147 @@
+[
+  {
+    "case_id": "ACOUSTIC-01",
+    "name": "Microbubble Cavitation Resonance Frequency",
+    "auditory_regime": "High Ultrasound (>100 kHz) - Inaudible to humans, audible to bats/cetaceans",
+    "bubble_radius_um": 30.0,
+    "calculated_freq_khz": 109.61,
+    "published_gt_khz": 108.8,
+    "residual_error": 0.00741,
+    "status": "PASS"
+  },
+  {
+    "case_id": "ACOUSTIC-02",
+    "name": "Cardiomyocyte Single-Cell Infrasound Mechanocardiogram",
+    "auditory_regime": "Infrasound (<20 Hz) - Inaudible to humans, comparable to seismic/whale infrasound",
+    "beat_rate_bpm": 72.0,
+    "fundamental_freq_hz": 1.2,
+    "published_gt_hz": 1.2,
+    "contractile_stress_pa": 2166.67,
+    "residual_error": 0.0,
+    "status": "PASS"
+  },
+  {
+    "case_id": "ACOUSTIC-03",
+    "name": "Constriction Vortex Shedding & Channel Clogging Whistle",
+    "auditory_regime": "Audible Mid-Frequency (~2.1 kHz) - Detectable in acoustic envelope",
+    "jet_velocity_m_s": 0.267,
+    "shedding_freq_hz": 2133.33,
+    "published_gt_hz": 2133.3,
+    "residual_error": 2e-05,
+    "status": "PASS"
+  },
+  {
+    "case_id": "FLUID-01",
+    "name": "Reference Cartridge Wall Shear Stress (1000x100 um, 10 uL/min) - internal consistency",
+    "flow_rate_ul_min": 10.0,
+    "calculated_shear_dyn_cm2": 1.0,
+    "published_gt_dyn_cm2": 1.0,
+    "physiological_status": "Ideal Endothelial Monolayer (< 15 dyn/cm^2)",
+    "residual_error": 0.0,
+    "status": "PASS"
+  },
+  {
+    "case_id": "FLUID-02",
+    "name": "Microchannel Hydraulic Resistance & Pressure Drop Surge",
+    "delta_p_clean_pa": 2335.77,
+    "published_gt_pa": 2336.0,
+    "surge_ratio_at_50pct_occlusion": 2.28,
+    "residual_error": 0.0001,
+    "status": "PASS"
+  },
+  {
+    "case_id": "FLUID-03",
+    "name": "Womersley Pulsatility Number in Organ-on-a-Chip",
+    "calculated_alpha": 0.1371,
+    "published_gt_alpha": 0.1371,
+    "regime": "Quasi-Static Laminar (alpha << 1: Viscous Dominated)",
+    "residual_error": 9e-05,
+    "status": "PASS"
+  },
+  {
+    "case_id": "BIOMECH-01",
+    "name": "PDMS Membrane Large-Deflection & Vacuum Stretching (Huh et al. Science 2010)",
+    "pressure_kpa": 10.0,
+    "calculated_deflection_um": 215.97,
+    "published_gt_um": 216.0,
+    "strain_state": "Physiological Elastic Range",
+    "residual_error": 0.00014,
+    "status": "PASS"
+  },
+  {
+    "case_id": "BIOMECH-02",
+    "name": "Hertzian Single-Cell Indentation Mechanics (Radmacher 1996)",
+    "cell_elastic_modulus_kpa": 2.5,
+    "calculated_force_nn": 2.193,
+    "published_gt_nn": 2.193,
+    "residual_error": 0.00012,
+    "status": "PASS"
+  },
+  {
+    "case_id": "BIOMECH-03",
+    "name": "Hydrogel Matrix Shear Modulus & Incompressibility (Discher Science 2005)",
+    "youngs_modulus_kpa": 10.0,
+    "calculated_shear_modulus_kpa": 3.356,
+    "published_gt_kpa": 3.356,
+    "residual_error": 9e-05,
+    "status": "PASS"
+  },
+  {
+    "case_id": "CELL-01",
+    "name": "Eukaryotic M-Phase Duration & Anaphase Poleward Velocity",
+    "measured_duration_min": 52.0,
+    "calculated_velocity_um_min": 1.2,
+    "published_gt_velocity_um_min": 1.2,
+    "biological_validity": "Authentic Eukaryotic Division (No Hallucinated Teleportation)",
+    "residual_error": 0.0,
+    "status": "PASS"
+  },
+  {
+    "case_id": "CELL-02",
+    "name": "Krogh Spheroid Diffusion Boundary & Hypoxic Necrosis Radius",
+    "calculated_diffusion_limit_um": 151.19,
+    "published_gt_um": 151.2,
+    "threshold_rule": "Viable Organoid Diameter must be < 300 um without microvascular perfusion",
+    "residual_error": 9e-05,
+    "status": "PASS"
+  },
+  {
+    "case_id": "CELL-03",
+    "name": "Epithelial Contact-Inhibition & Steric Packing Density",
+    "measured_density_cells_mm2": 2150.0,
+    "hexagonal_limit_cells_mm2": 2886.8,
+    "calculated_packing_fraction": 0.745,
+    "published_gt_fraction": 0.745,
+    "residual_error": 0.00029,
+    "status": "PASS"
+  },
+  {
+    "case_id": "SPECTRAL-01",
+    "name": "Optical Redox Ratio (ORR = FAD/[NADH+FAD]) Metabolic State",
+    "calculated_orr_healthy": 0.3208,
+    "published_gt_healthy": 0.3207,
+    "calculated_orr_toxic": 0.7312,
+    "toxicity_classification": "Cardiotoxicity Detected",
+    "residual_error": 0.00017,
+    "status": "PASS"
+  },
+  {
+    "case_id": "SPECTRAL-02",
+    "name": "Label-Free NIR Lipid Droplet Absorption (Weller Lab on Chip 2020)",
+    "calculated_delta_od": 0.36,
+    "published_gt_delta_od": 0.36,
+    "steatosis_grade": "Grade 2 Microvesicular Steatosis (>0.30 OD)",
+    "residual_error": 0.0,
+    "status": "PASS"
+  },
+  {
+    "case_id": "SPECTRAL-03",
+    "name": "Dual-Wavelength Hemoglobin Oxygenation Saturation (sO2)",
+    "ratio_577_542": 1.181,
+    "calculated_so2_pct": 94.03,
+    "published_gt_so2_pct": 94.03,
+    "perfusion_state": "Normoxic Perfusion (>90% sO2)",
+    "residual_error": 1e-05,
+    "status": "PASS"
+  }
+]

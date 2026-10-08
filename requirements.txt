@@ -1,0 +1,10 @@
+# Measured pipeline (evaluate.py)
+numpy>=1.24
+scipy>=1.11          # scipy.optimize.milp (HiGHS) for the network-flow ILP
+scikit-image>=0.21   # Otsu / watershed label-free detection baseline
+tifffile>=2023.4
+py-ctcmetrics>=1.0   # official Cell Tracking Challenge DET/TRA
+
+# Simulated modules & tests (src/)
+tqdm>=4.65
+requests>=2.28

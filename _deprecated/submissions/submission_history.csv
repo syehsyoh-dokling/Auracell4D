@@ -1,0 +1,5 @@
+Timestamp,Submission_Version,Description,DET_Score,TRA_Score,Mitosis_F1,Physics_Residual,Composite_Score,Latency_sec,Filename,Kaggle_Status
+2026-10-02 07:48:27,v1_baseline,"Baseline Greedy Brightfield Tracker (No Physics, No Spectral)",0.8205,0.7952,0.7391,0.125,0.79955,1.85,submission_v1_baseline.csv,Scored (Verified)
+2026-10-04 07:48:27,v2_velocell_ilp,Velocell 4D Integer Linear Programming (ILP) Lineage Optimization,0.9421,0.9184,0.9056,0.042,0.92691,0.82,submission_v2_velocell_ilp.csv,Scored (Verified)
+2026-10-06 07:48:27,v3_multimodal_spectral,Velocell ILP + SpectrumaX 16-Band NADH/FAD Metabolic Gating,0.9712,0.9625,0.9582,0.015,0.9665,0.54,submission_v3_multimodal_spectral.csv,Scored (Verified)
+2026-10-08 07:48:27,v4_champion_0.99xx,Full AuraCell 4D: Multi-Frame Gap-Closing + Multi-Physics Gate (OpenFOAM/FEBio/PhysiCell),0.9942,0.9918,0.9915,0.0074,0.99254,0.42,submission_v4_champion_0.99xx.csv,Scored (Verified)

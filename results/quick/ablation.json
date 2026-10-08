@@ -1,0 +1,65 @@
+{
+  "dataset": "CTC Fluo-N3DH-CHO (training, 01 & 02)",
+  "spacing_um_zyx": [
+    1.0,
+    0.202,
+    0.202
+  ],
+  "dt_min": 9.5,
+  "gate_calibration": {
+    "n_divisions": 3,
+    "daughter_ratio_p5_p50_p95": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "mass_ratio_p5_p50_p95": [
+      2.0,
+      2.0,
+      2.0
+    ],
+    "ratio_max": 1.1,
+    "mass_min": 1.8,
+    "mass_max": 2.2
+  },
+  "gate_original": {
+    "ratio_max": 1.35,
+    "ratio_min": 0.75,
+    "mass_min": 0.85,
+    "mass_max": 1.15,
+    "source": "mitosis_ilp.py asli (+/-15%)"
+  },
+  "rows": [
+    {
+      "seq": "01",
+      "detect": "gt",
+      "tracker": "greedy_nogate",
+      "frames": 92,
+      "DET": 1.0,
+      "TRA": 0.9276,
+      "mitosis_pred": 178,
+      "mitosis_gt": 4,
+      "mitosis_tp": 1,
+      "mitosis_precision": 0.006,
+      "mitosis_recall": 0.25,
+      "mitosis_f1": 0.011,
+      "sec_per_volume": 0.16
+    },
+    {
+      "seq": "01",
+      "detect": "gt",
+      "tracker": "ilp_gate",
+      "frames": 92,
+      "DET": 1.0,
+      "TRA": 0.9976,
+      "mitosis_pred": 5,
+      "mitosis_gt": 4,
+      "mitosis_tp": 1,
+      "mitosis_precision": 0.2,
+      "mitosis_recall": 0.25,
+      "mitosis_f1": 0.222,
+      "sec_per_volume": 0.108
+    }
+  ],
+  "catatan": "detect=gt: deteksi sempurna (DET=1 by construction), mengukur linking saja. detect=otsu: label-free, tanpa GT. Gate dikalibrasi dari sekuens 02; angka pada sekuens itu bukan uji independen."
+}
