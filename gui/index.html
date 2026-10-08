@@ -842,6 +842,8 @@
       drawSpectral();
       drawCells();
       checkServer().then(ok => { if (ok) loadResults(); });
+      // deep link for screenshots/docs: index.html#step=4
+      const m = location.hash.match(/step=(\d)/); if (m) goToStep(parseInt(m[1], 10));
     });
   </script>
 </body>
